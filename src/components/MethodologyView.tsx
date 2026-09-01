@@ -48,7 +48,7 @@ function ScoreScale({ theme }: { theme: "light" | "dark" }) {
 			{levels.map((level) => (
 				<div key={level.label} className="flex items-center gap-4">
 					<div
-						className="w-3 h-3 rounded-full flex-shrink-0"
+						className="w-3 h-3 rounded-full shrink-0"
 						style={{
 							background: getSentimentColor(level.score, theme),
 						}}
