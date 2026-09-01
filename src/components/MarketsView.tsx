@@ -561,9 +561,9 @@ export function MarketsView({
 					className="text-base leading-relaxed"
 					style={{ color: "var(--color-text-secondary)" }}
 				>
-				Comprehensive market-level analysis featuring detailed statistical
-				decompositions, cross-provider sentiment distributions, and
-				algorithmically generated insights.
+					Comprehensive market-level analysis featuring detailed
+					statistical decompositions, cross-provider sentiment
+					distributions, and algorithmically generated insights.
 				</p>
 			</div>
 

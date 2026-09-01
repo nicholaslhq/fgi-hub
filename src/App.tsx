@@ -56,7 +56,8 @@ function MarketComparison({
 	const stockNeutral = stockLabel === "Neutral";
 
 	const cryptoLabel = sentimentLabel(crypto.score);
-	const cryptoGreed = cryptoLabel === "Greed" || cryptoLabel === "Extreme Greed";
+	const cryptoGreed =
+		cryptoLabel === "Greed" || cryptoLabel === "Extreme Greed";
 	const cryptoFear = cryptoLabel === "Fear" || cryptoLabel === "Extreme Fear";
 	const cryptoNeutral = cryptoLabel === "Neutral";
 
@@ -167,50 +168,50 @@ function getAggregatedSentiment(
 	crypto: ConsensusResult,
 	theme: "light" | "dark",
 ) {
-  // ═══════════════════════════════════════════════════════════════
-  // PHASE 1: Per-Market Characterization
-  //    Each market's ARA consensus confidence (0–1) quantifies
-  //    how reliable the per-market score is.
-  // ═══════════════════════════════════════════════════════════════
+	// ═══════════════════════════════════════════════════════════════
+	// PHASE 1: Per-Market Characterization
+	//    Each market's ARA consensus confidence (0–1) quantifies
+	//    how reliable the per-market score is.
+	// ═══════════════════════════════════════════════════════════════
 
-  const stockDeviation = stock.score - 50;
-  const cryptoDeviation = crypto.score - 50;
-  const stockIntensity = Math.abs(stockDeviation);
-  const cryptoIntensity = Math.abs(cryptoDeviation);
+	const stockDeviation = stock.score - 50;
+	const cryptoDeviation = crypto.score - 50;
+	const stockIntensity = Math.abs(stockDeviation);
+	const cryptoIntensity = Math.abs(cryptoDeviation);
 
-  // Cross-market confidence levels (derived from per-market ARA)
+	// Cross-market confidence levels (derived from per-market ARA)
 
-  // ═══════════════════════════════════════════════════════════════
-  // PHASE 2: Cross-Market Synthesis
-  //    Confidence-weighted blend with Bayesian regularization
-  //    toward neutral (50). Only 2 data points, so shrinkage
-  //    strength is higher than per-market aggregation.
-  // ═══════════════════════════════════════════════════════════════
+	// ═══════════════════════════════════════════════════════════════
+	// PHASE 2: Cross-Market Synthesis
+	//    Confidence-weighted blend with Bayesian regularization
+	//    toward neutral (50). Only 2 data points, so shrinkage
+	//    strength is higher than per-market aggregation.
+	// ═══════════════════════════════════════════════════════════════
 
-  const spread = Math.abs(stock.score - crypto.score);
-  const totalConfidence = stock.confidence + crypto.confidence;
-  const stockWeight =
-    totalConfidence > 0 ? stock.confidence / totalConfidence : 0.5;
-  const rawAggregated =
-    stock.score * stockWeight + crypto.score * (1 - stockWeight);
+	const spread = Math.abs(stock.score - crypto.score);
+	const totalConfidence = stock.confidence + crypto.confidence;
+	const stockWeight =
+		totalConfidence > 0 ? stock.confidence / totalConfidence : 0.5;
+	const rawAggregated =
+		stock.score * stockWeight + crypto.score * (1 - stockWeight);
 
-  const crossMarketShrinkage = 4;
-  const effectiveN = totalConfidence * 2;
-  const aggregatedScore = Math.round(
-    (rawAggregated * effectiveN + 50 * crossMarketShrinkage) /
-      (effectiveN + crossMarketShrinkage),
-  );
+	const crossMarketShrinkage = 4;
+	const effectiveN = totalConfidence * 2;
+	const aggregatedScore = Math.round(
+		(rawAggregated * effectiveN + 50 * crossMarketShrinkage) /
+			(effectiveN + crossMarketShrinkage),
+	);
 
-  // ═══════════════════════════════════════════════════════════════
-  // PHASE 3: Dynamic Classification
-  // ═══════════════════════════════════════════════════════════════
+	// ═══════════════════════════════════════════════════════════════
+	// PHASE 3: Dynamic Classification
+	// ═══════════════════════════════════════════════════════════════
 
-  const isAligned = stock.label === crypto.label;
-  const dominantMarket =
-    stockIntensity >= cryptoIntensity ? "stock" : "crypto";
-  const spreadLevel = getSpreadLevel(spread);
-  const avgConfidence = (stock.confidence + crypto.confidence) / 2;
-  const consensusQuality = getConsensusQuality(avgConfidence);
+	const isAligned = stock.label === crypto.label;
+	const dominantMarket =
+		stockIntensity >= cryptoIntensity ? "stock" : "crypto";
+	const spreadLevel = getSpreadLevel(spread);
+	const avgConfidence = (stock.confidence + crypto.confidence) / 2;
+	const consensusQuality = getConsensusQuality(avgConfidence);
 
 	// ═══════════════════════════════════════════════════════════════
 	// PHASE 4: Composable Dynamic Description
