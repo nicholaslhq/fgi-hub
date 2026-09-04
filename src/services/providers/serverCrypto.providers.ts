@@ -234,11 +234,150 @@ export async function fetchFearGreedMeterCrypto(): Promise<ProviderScore> {
 	};
 }
 
+export async function fetchCfgiCrypto(): Promise<ProviderScore> {
+	const controller = new AbortController();
+	const timeout = setTimeout(() => controller.abort(), TIMEOUT_MS);
+	let html: string;
+	try {
+		const res = await fetch(
+			"https://cfgi.io/widget/embed/?symbol=MARKET&theme=dark&timeframe=1d",
+			{
+				signal: controller.signal,
+				headers: {
+					"User-Agent":
+						"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+					Accept: "text/html,application/xhtml+xml",
+				},
+			},
+		);
+		if (!res.ok) {
+			throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+		}
+		html = await res.text();
+	} finally {
+		clearTimeout(timeout);
+	}
+
+	const valueMatch = html.match(/<span class="num value">(\d+)<\/span>/);
+	const classMatch = html.match(/<span class="classification">([^<]+)<\/span>/);
+	const metaMatch = html.match(/<p class="meta">([^<]+)<\/p>/);
+
+	if (!valueMatch) {
+		throw new Error("CFGI Crypto: could not find value span");
+	}
+
+	const score = parseInt(valueMatch[1], 10);
+	const classification = classMatch?.[1]?.trim();
+	const metaText = metaMatch?.[1]?.trim() ?? "";
+
+	const dateMatch = metaText.match(/as of (.+)$/);
+	let timestamp = new Date().toISOString();
+	if (dateMatch) {
+		const parsed = new Date(dateMatch[1].trim() + " UTC");
+		if (!Number.isNaN(parsed.getTime())) {
+			timestamp = parsed.toISOString();
+		}
+	}
+
+	return {
+		provider: "CFGI (Crypto)",
+		score,
+		label: sentimentLabel(score),
+		timestamp,
+		confidence: 0.8,
+		market: "crypto",
+		source: "https://cfgi.io/widget/embed/?symbol=MARKET&theme=dark&timeframe=1d",
+		method: "html_scrape",
+		retrievedAt: new Date().toISOString(),
+		freshness: "realtime",
+		metadata: { source: "cfgi_crypto", classification },
+	};
+}
+
+export async function fetchCoinMarketCapFgi(): Promise<ProviderScore> {
+	const controller = new AbortController();
+	const timeout = setTimeout(() => controller.abort(), TIMEOUT_MS);
+	let html: string;
+	try {
+		const res = await fetch(
+			"https://coinmarketcap.com/charts/fear-and-greed-index/",
+			{
+				signal: controller.signal,
+				headers: {
+					"User-Agent":
+						"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+					Accept: "text/html,application/xhtml+xml",
+				},
+			},
+		);
+		if (!res.ok) {
+			throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+		}
+		html = await res.text();
+	} finally {
+		clearTimeout(timeout);
+	}
+
+	const startMarker = '<script id="__NEXT_DATA__" type="application/json"';
+	const startIdx = html.indexOf(startMarker);
+	if (startIdx < 0) {
+		throw new Error("CoinMarketCap: __NEXT_DATA__ script not found");
+	}
+	const jsonStart = html.indexOf(">", startIdx) + 1;
+	const endIdx = html.indexOf("</script>", jsonStart);
+	if (endIdx < 0) {
+		throw new Error("CoinMarketCap: __NEXT_DATA__ end tag not found");
+	}
+
+	const data = JSON.parse(html.substring(jsonStart, endIdx)) as {
+		props?: {
+			pageProps?: {
+				pageSharedData?: {
+					fearGreedIndexData?: {
+						currentIndex?: {
+							score?: number;
+							name?: string;
+							updateTime?: string;
+						};
+					};
+				};
+			};
+		};
+	};
+
+	const current =
+		data?.props?.pageProps?.pageSharedData?.fearGreedIndexData?.currentIndex;
+	if (!current || typeof current.score !== "number") {
+		throw new Error("CoinMarketCap: missing fearGreedIndexData.currentIndex.score");
+	}
+
+	const score = Math.round(current.score);
+	const timestamp = current.updateTime
+		? new Date(current.updateTime).toISOString()
+		: new Date().toISOString();
+
+	return {
+		provider: "CoinMarketCap",
+		score,
+		label: sentimentLabel(score),
+		timestamp,
+		confidence: 0.85,
+		market: "crypto",
+		source: "https://coinmarketcap.com/charts/fear-and-greed-index/",
+		method: "html_scrape",
+		retrievedAt: new Date().toISOString(),
+		freshness: "realtime",
+		metadata: { source: "coinmarketcap", name: current.name },
+	};
+}
+
 export const serverCryptoProviders: Array<() => Promise<ProviderScore>> = [
 	fetchAlternativeMe,
 	fetchQiaobax,
 	fetchFearGreedChartCrypto,
 	fetchFearGreedMeterCrypto,
+	fetchCfgiCrypto,
+	fetchCoinMarketCapFgi,
 ];
 
 export const cryptoProviderNames = [
@@ -246,6 +385,8 @@ export const cryptoProviderNames = [
 	"Qiaobax",
 	"FearGreedChart (Crypto)",
 	"FearGreedMeter (Crypto)",
+	"CFGI (Crypto)",
+	"CoinMarketCap",
 ];
 
 export function getCryptoMarket(): Market {

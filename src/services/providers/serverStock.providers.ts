@@ -235,11 +235,52 @@ export async function fetchFearGreedMeterStock(): Promise<ProviderScore> {
 	};
 }
 
+export async function fetchCfgiStock(): Promise<ProviderScore> {
+	const url = "https://cfgi.io/widget/embed/?symbol=STOCK_MARKET&theme=dark&timeframe=1d";
+	const html = await fetchText(url);
+
+	const valueMatch = html.match(/<span class="num value">(\d+)<\/span>/);
+	const classMatch = html.match(/<span class="classification">([^<]+)<\/span>/);
+	const metaMatch = html.match(/<p class="meta">([^<]+)<\/p>/);
+
+	if (!valueMatch) {
+		throw new Error("CFGI Stock: could not find value span");
+	}
+
+	const score = parseInt(valueMatch[1], 10);
+	const classification = classMatch?.[1]?.trim();
+	const metaText = metaMatch?.[1]?.trim() ?? "";
+
+	const dateMatch = metaText.match(/as of (.+)$/);
+	let timestamp = new Date().toISOString();
+	if (dateMatch) {
+		const parsed = new Date(dateMatch[1].trim() + " UTC");
+		if (!Number.isNaN(parsed.getTime())) {
+			timestamp = parsed.toISOString();
+		}
+	}
+
+	return {
+		provider: "CFGI (Stock)",
+		score,
+		label: sentimentLabel(score),
+		timestamp,
+		confidence: 0.8,
+		market: "stock",
+		source: "https://cfgi.io/widget/embed/?symbol=STOCK_MARKET&theme=dark&timeframe=1d",
+		method: "html_scrape",
+		retrievedAt: new Date().toISOString(),
+		freshness: "realtime",
+		metadata: { source: "cfgi_stock", classification },
+	};
+}
+
 export const serverStockProviders: Array<() => Promise<ProviderScore>> = [
 	fetchCnnFearGreed,
 	fetchFearGreedChartStock,
 	fetchCboePutCallRatio,
 	fetchFearGreedMeterStock,
+	fetchCfgiStock,
 ];
 
 export const stockProviderNames = [
@@ -247,6 +288,7 @@ export const stockProviderNames = [
 	"FearGreedChart (Stock)",
 	"CBOE Put/Call Ratio",
 	"FearGreedMeter (Stock)",
+	"CFGI (Stock)",
 ];
 
 export function getStockMarket(): Market {
