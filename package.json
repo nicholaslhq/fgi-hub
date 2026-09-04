@@ -5,18 +5,26 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "dev:server": "FGI_DATA_MODE=prod tsx --watch src/server/index.ts",
     "build": "tsc -b && vite build",
+    "build:server": "tsc -b && tsc src/server/index.ts --outDir dist/server --module nodenext --moduleResolution nodenext --target es2023",
     "lint": "oxlint",
     "preview": "vite preview",
+    "start": "node dist/server/index.js",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.3.3",
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.6",
+    "cors": "^2.8.6",
+    "express": "^5.2.1",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
-    "tailwindcss": "^4.3.3"
+    "tailwindcss": "^4.3.3",
+    "tsx": "^4.23.13"
   },
   "devDependencies": {
     "@types/node": "^24.13.3",

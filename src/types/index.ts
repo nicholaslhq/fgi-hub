@@ -7,6 +7,16 @@ export type SentimentLabel =
 	| "Greed"
 	| "Extreme Greed";
 
+export type AcquisitionMethod =
+	| "api_json"
+	| "html_scrape"
+	| "csv_download"
+	| "websocket"
+	| "graphql"
+	| "fallback";
+
+export type DataFreshness = "realtime" | "delayed" | "stale" | "expired";
+
 export interface ProviderScore {
 	provider: string;
 	score: number;
@@ -15,6 +25,11 @@ export interface ProviderScore {
 	confidence?: number;
 	metadata?: Record<string, unknown>;
 	error?: string;
+	market?: Market;
+	source?: string;
+	method?: AcquisitionMethod;
+	retrievedAt?: string;
+	freshness?: DataFreshness;
 }
 
 export type AggregationStrategy =

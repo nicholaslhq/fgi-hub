@@ -41,8 +41,8 @@ describe("median", () => {
 	it("returns median of odd-length array", () => {
 		expect(median([1, 3, 2])).toBe(2);
 	});
-	it("returns median of even-length array", () => {
-		expect(median([1, 2, 3, 4])).toBe(2.5);
+	it("returns median of even-length array as integer", () => {
+		expect(median([1, 2, 3, 4])).toBe(3);
 	});
 	it("returns NaN for empty array", () => {
 		expect(Number.isNaN(median([]))).toBe(true);
@@ -334,18 +334,18 @@ describe("aggregate", () => {
 		expect(result!.score).toBeLessThan(75); // regularized toward neutral
 	});
 
-	it("excludes stale providers", () => {
-		const providers = [
-			makeProvider(80, { confidence: 0.9 }),
-			makeProvider(70, {
-				confidence: 0.8,
-				timestamp: new Date(Date.now() - 20 * 60_000).toISOString(),
-			}),
-		];
-		const result = aggregate("stock", providers);
-		expect(result).not.toBeNull();
-		expect(result!.providerCount).toBe(1);
-	});
+  it("excludes stale providers", () => {
+    const providers = [
+      makeProvider(80, { confidence: 0.9 }),
+      makeProvider(70, {
+        confidence: 0.8,
+        timestamp: new Date(Date.now() - 25 * 60 * 60_000).toISOString(),
+      }),
+    ];
+    const result = aggregate("stock", providers);
+    expect(result).not.toBeNull();
+    expect(result!.providerCount).toBe(1);
+  });
 
 	it("computes confidence interval that contains the score", () => {
 		const providers = freshProviders([45, 50, 55, 52, 48, 50, 51, 49]);
@@ -441,6 +441,43 @@ describe("aggregate", () => {
 		expect(result!.details).toHaveProperty("confidence");
 		expect(result!.details).toHaveProperty("ciLower");
 		expect(result!.details).toHaveProperty("ciUpper");
+	});
+
+	it("returns integer score", () => {
+		const providers = freshProviders([45, 50, 55, 52, 48]);
+		const result = aggregate("stock", providers);
+		expect(result).not.toBeNull();
+		expect(Number.isInteger(result!.score)).toBe(true);
+	});
+
+	it("returns integer ciLower and ciUpper", () => {
+		const providers = freshProviders([45, 50, 55, 52, 48]);
+		const result = aggregate("stock", providers);
+		expect(result).not.toBeNull();
+		expect(Number.isInteger(result!.ciLower)).toBe(true);
+		expect(Number.isInteger(result!.ciUpper)).toBe(true);
+	});
+
+	it("returns integer median, weightedMean, and trimmedMean in details", () => {
+		const providers = freshProviders([45, 50, 55, 52, 48]);
+		const result = aggregate("stock", providers);
+		expect(result).not.toBeNull();
+		expect(Number.isInteger(result!.details.median)).toBe(true);
+		expect(Number.isInteger(result!.details.weightedMean)).toBe(true);
+		expect(Number.isInteger(result!.details.trimmedMean)).toBe(true);
+	});
+
+	it("returns integer score even when provider scores are floats", () => {
+		const providers = [
+			makeProvider(31.2571428571429, { confidence: 0.9 }),
+			makeProvider(50, { confidence: 0.9 }),
+			makeProvider(60, { confidence: 0.9 }),
+		];
+		const result = aggregate("stock", providers);
+		expect(result).not.toBeNull();
+		expect(Number.isInteger(result!.score)).toBe(true);
+		expect(Number.isInteger(result!.ciLower)).toBe(true);
+		expect(Number.isInteger(result!.ciUpper)).toBe(true);
 	});
 });
 

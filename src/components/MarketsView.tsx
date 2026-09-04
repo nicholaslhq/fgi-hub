@@ -371,12 +371,13 @@ export function MarketSection({
 			data?.details && data.details.n > 0
 				? Math.round((data.details.outlierCount / data.details.n) * 100)
 				: 0;
+		const iqrRounded = Math.round(iqrVal);
 
 		return {
 			range: `${min}-${max}`,
 			delta: max - min,
-			iqr: Math.round(iqrVal),
-			agreement: `${Math.round((1 - iqrVal / 100) * 100)}%`,
+			iqr: iqrRounded,
+			agreement: `${Math.round((1 - iqrRounded / 100) * 100)}%`,
 			variance: Math.round(varVal),
 			outlierRatio: `${outlierRatio}%`,
 		};

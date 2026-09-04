@@ -189,18 +189,17 @@ function getAggregatedSentiment(
 	// ═══════════════════════════════════════════════════════════════
 
 	const spread = Math.abs(stock.score - crypto.score);
-	const totalConfidence = stock.confidence + crypto.confidence;
-	const stockWeight =
-		totalConfidence > 0 ? stock.confidence / totalConfidence : 0.5;
-	const rawAggregated =
-		stock.score * stockWeight + crypto.score * (1 - stockWeight);
 
 	const crossMarketShrinkage = 4;
-	const effectiveN = totalConfidence * 2;
-	const aggregatedScore = Math.round(
-		(rawAggregated * effectiveN + 50 * crossMarketShrinkage) /
-			(effectiveN + crossMarketShrinkage),
-	);
+	const stockConfScaled = Math.round(stock.confidence * 1000);
+	const cryptoConfScaled = Math.round(crypto.confidence * 1000);
+	const totalConfScaled = stockConfScaled + cryptoConfScaled;
+	const numerator =
+		2 *
+			(stock.score * stockConfScaled + crypto.score * cryptoConfScaled) +
+		50 * crossMarketShrinkage * 1000;
+	const denominator = 2 * totalConfScaled + crossMarketShrinkage * 1000;
+	const aggregatedScore = Math.round(numerator / denominator);
 
 	// ═══════════════════════════════════════════════════════════════
 	// PHASE 3: Dynamic Classification

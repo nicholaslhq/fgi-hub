@@ -3,15 +3,15 @@ import type {
 	AggregationStrategy,
 	ConsensusResult,
 	ProviderScore,
-} from "../types";
-import { sentimentLabel } from "../utils/sentiment";
+} from "../types/index.js";
+import { sentimentLabel } from "../utils/sentiment.js";
 
 // ── Configuration Constants ────────────────────────────────────────────────
 //
 // Every threshold has a statistical rationale. None are tuned to a specific
 // dataset; the framework adapts to any input distribution.
 
-const STALE_THRESHOLD_MS = 15 * 60_000;
+const STALE_THRESHOLD_MS = 24 * 60 * 60_000; // 24 hours — accommodates daily-refresh data sources
 
 const RECENCY_TAU_MIN = 5; // exponential half-life for age decay
 const OUTLIER_ROBUST_K = 3.5; // robust z-score threshold (Iglewicz & Hoaglin)
@@ -39,19 +39,21 @@ function median(values: number[]): number {
 	const sorted = [...values].sort((a, b) => a - b);
 	const mid = Math.floor(sorted.length / 2);
 	if (sorted.length % 2 === 1) return sorted[mid];
-	return (sorted[mid - 1] + sorted[mid]) / 2;
+	return Math.round((sorted[mid - 1] + sorted[mid]) / 2);
 }
 
 function mean(values: number[]): number {
 	if (values.length === 0) return NaN;
-	return values.reduce((a, b) => a + b, 0) / values.length;
+	return Math.round(values.reduce((a, b) => a + b, 0) / values.length);
 }
 
 function weightedMean(values: number[], weights: number[]): number {
 	if (values.length === 0) return NaN;
 	const sumW = weights.reduce((a, b) => a + b, 0);
 	if (sumW === 0) return NaN;
-	return values.reduce((sum, v, i) => sum + weights[i] * v, 0) / sumW;
+	return Math.round(
+		values.reduce((sum, v, i) => sum + weights[i] * v, 0) / sumW,
+	);
 }
 
 function weightedVariance(
@@ -371,7 +373,7 @@ function computeScore(
 	if (Number.isNaN(score) && !Number.isNaN(wm)) score = wm;
 	if (Number.isNaN(score) && !Number.isNaN(med)) score = med;
 
-	return clamp(score, 0, 100);
+	return Math.round(clamp(score, 0, 100));
 }
 
 function computeConfidence(q: QualityMetrics): number {
@@ -437,8 +439,8 @@ function computeConfidenceInterval(
 
 	const margin = CONFIDENCE_Z_95 * se;
 	return {
-		ciLower: clamp(score - margin, 0, 100),
-		ciUpper: clamp(score + margin, 0, 100),
+		ciLower: Math.round(clamp(score - margin, 0, 100)),
+		ciUpper: Math.round(clamp(score + margin, 0, 100)),
 	};
 }
 
@@ -455,7 +457,7 @@ function applyTemporalSmoothing(
 		TEMPORAL_ALPHA_MIN,
 		TEMPORAL_ALPHA_MAX,
 	);
-	return alpha * score + (1 - alpha) * previousScore;
+	return Math.round(alpha * score + (1 - alpha) * previousScore);
 }
 
 // ── Main Aggregation Function ─────────────────────────────────────────────
@@ -489,9 +491,7 @@ export function aggregate(
 
 	const rawScore = computeScore(strategy, estimators, weighted);
 	const confidence = computeConfidence(quality);
-	const score = Math.round(
-		applyTemporalSmoothing(rawScore, confidence, previousScore),
-	);
+	const score = applyTemporalSmoothing(rawScore, confidence, previousScore);
 
 	const { ciLower, ciUpper } = computeConfidenceInterval(
 		score,
@@ -523,8 +523,8 @@ export function aggregate(
 		strategy,
 		score,
 		confidence: Math.round(confidence * 1000) / 1000,
-		ciLower: Math.round(ciLower),
-		ciUpper: Math.round(ciUpper),
+		ciLower,
+		ciUpper,
 	};
 
 	return {
@@ -535,8 +535,8 @@ export function aggregate(
 		lastUpdated,
 		providers,
 		confidence: Math.round(confidence * 1000) / 1000,
-		ciLower: Math.round(ciLower),
-		ciUpper: Math.round(ciUpper),
+		ciLower,
+		ciUpper,
 		strategy,
 		details,
 	};

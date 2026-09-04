@@ -1,4 +1,4 @@
-import type { SentimentLabel } from "../types";
+import type { SentimentLabel } from "../types/index.js";
 
 export const EXTREME_FEAR_MAX = 20;
 export const FEAR_MAX = 40;
