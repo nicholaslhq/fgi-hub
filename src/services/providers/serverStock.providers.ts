@@ -178,16 +178,75 @@ function pcrToSentimentScore(pcr: number): number {
 	return Math.round(normalized * 100);
 }
 
+async function fetchFearGreedMeterPage(url: string): Promise<unknown> {
+	const html = await fetchText(url);
+	const startMarker = '<script id="__NEXT_DATA__" type="application/json">';
+	const startIdx = html.indexOf(startMarker);
+	if (startIdx < 0) {
+		throw new Error("FearGreedMeter: __NEXT_DATA__ script not found");
+	}
+	const jsonStart = startIdx + startMarker.length;
+	const endIdx = html.indexOf("</script>", jsonStart);
+	if (endIdx < 0) {
+		throw new Error("FearGreedMeter: __NEXT_DATA__ end tag not found");
+	}
+	const jsonStr = html.substring(jsonStart, endIdx);
+	return JSON.parse(jsonStr);
+}
+
+export async function fetchFearGreedMeterStock(): Promise<ProviderScore> {
+	const url = "https://feargreedmeter.com/";
+	const data = (await fetchFearGreedMeterPage(url)) as {
+		props?: {
+			pageProps?: {
+				data?: {
+					fgi?: {
+						latest?: { now?: number; date?: string };
+						last_update?: string;
+					};
+				};
+			};
+		};
+	};
+
+	const fgi = data?.props?.pageProps?.data?.fgi;
+	const now = fgi?.latest?.now;
+	if (typeof now !== "number") {
+		throw new Error("FearGreedMeter Stock: missing fgi.latest.now");
+	}
+
+	const score = Math.round(now);
+	const timestamp = fgi?.last_update
+		? new Date(fgi.last_update).toISOString()
+		: new Date().toISOString();
+
+	return {
+		provider: "FearGreedMeter (Stock)",
+		score,
+		label: sentimentLabel(score),
+		timestamp,
+		confidence: 0.85,
+		market: "stock",
+		source: "https://feargreedmeter.com/",
+		method: "html_scrape",
+		retrievedAt: new Date().toISOString(),
+		freshness: "realtime",
+		metadata: { source: "feargreedmeter_stock", date: fgi?.latest?.date },
+	};
+}
+
 export const serverStockProviders: Array<() => Promise<ProviderScore>> = [
 	fetchCnnFearGreed,
 	fetchFearGreedChartStock,
 	fetchCboePutCallRatio,
+	fetchFearGreedMeterStock,
 ];
 
 export const stockProviderNames = [
 	"CNN Fear & Greed",
 	"FearGreedChart (Stock)",
 	"CBOE Put/Call Ratio",
+	"FearGreedMeter (Stock)",
 ];
 
 export function getStockMarket(): Market {

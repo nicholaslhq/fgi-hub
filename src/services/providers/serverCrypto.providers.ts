@@ -145,16 +145,107 @@ export async function fetchFearGreedChartCrypto(): Promise<ProviderScore> {
 	};
 }
 
+async function fetchFearGreedMeterPage(url: string): Promise<unknown> {
+	const controller = new AbortController();
+	const timeout = setTimeout(() => controller.abort(), TIMEOUT_MS);
+	try {
+		const res = await fetch(url, {
+			signal: controller.signal,
+			headers: {
+				"User-Agent":
+					"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+				Accept: "text/html,application/xhtml+xml",
+			},
+		});
+		if (!res.ok) {
+			throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+		}
+		const html = await res.text();
+		const startMarker = '<script id="__NEXT_DATA__" type="application/json">';
+		const startIdx = html.indexOf(startMarker);
+		if (startIdx < 0) {
+			throw new Error("FearGreedMeter: __NEXT_DATA__ script not found");
+		}
+		const jsonStart = startIdx + startMarker.length;
+		const endIdx = html.indexOf("</script>", jsonStart);
+		if (endIdx < 0) {
+			throw new Error("FearGreedMeter: __NEXT_DATA__ end tag not found");
+		}
+		return JSON.parse(html.substring(jsonStart, endIdx));
+	} finally {
+		clearTimeout(timeout);
+	}
+}
+
+export async function fetchFearGreedMeterCrypto(): Promise<ProviderScore> {
+	const url = "https://feargreedmeter.com/crypto";
+	const data = (await fetchFearGreedMeterPage(url)) as {
+		props?: {
+			pageProps?: {
+				data?: {
+					fgi_crypto?: Array<{
+						value?: string | number;
+						timestamp?: number;
+						time_until_update?: number;
+					}>;
+				};
+			};
+		};
+	};
+
+	const series = data?.props?.pageProps?.data?.fgi_crypto;
+	if (!Array.isArray(series) || series.length === 0) {
+		throw new Error("FearGreedMeter Crypto: missing fgi_crypto series");
+	}
+
+	const entry = series[0];
+	const rawValue = entry.value;
+	const numericValue =
+		typeof rawValue === "number"
+			? rawValue
+			: typeof rawValue === "string"
+				? parseInt(rawValue, 10)
+				: NaN;
+	if (!Number.isFinite(numericValue)) {
+		throw new Error("FearGreedMeter Crypto: missing value in latest entry");
+	}
+
+	const score = Math.round(numericValue);
+	const timestamp =
+		typeof entry.timestamp === "number"
+			? new Date(entry.timestamp * 1000).toISOString()
+			: new Date().toISOString();
+
+	return {
+		provider: "FearGreedMeter (Crypto)",
+		score,
+		label: sentimentLabel(score),
+		timestamp,
+		confidence: 0.85,
+		market: "crypto",
+		source: "https://feargreedmeter.com/crypto",
+		method: "html_scrape",
+		retrievedAt: new Date().toISOString(),
+		freshness: "delayed",
+		metadata: {
+			source: "feargreedmeter_crypto",
+			timeUntilUpdate: entry.time_until_update,
+		},
+	};
+}
+
 export const serverCryptoProviders: Array<() => Promise<ProviderScore>> = [
 	fetchAlternativeMe,
 	fetchQiaobax,
 	fetchFearGreedChartCrypto,
+	fetchFearGreedMeterCrypto,
 ];
 
 export const cryptoProviderNames = [
 	"Alternative.me",
 	"Qiaobax",
 	"FearGreedChart (Crypto)",
+	"FearGreedMeter (Crypto)",
 ];
 
 export function getCryptoMarket(): Market {
