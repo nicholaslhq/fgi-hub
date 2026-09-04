@@ -154,12 +154,24 @@ export function ProviderRow({
 					title={provider.error || "Healthy"}
 				/>
 				<div className="min-w-0">
-					<p
-						className="text-sm font-medium truncate"
-						style={{ color: "var(--color-text-primary)" }}
-					>
-						{provider.provider}
-					</p>
+					{provider.source ? (
+						<a
+							href={provider.source}
+							target="_blank"
+							rel="noopener noreferrer"
+							className="text-sm font-medium truncate hover:underline"
+							style={{ color: "var(--color-text-primary)" }}
+						>
+							{provider.provider}
+						</a>
+					) : (
+						<p
+							className="text-sm font-medium truncate"
+							style={{ color: "var(--color-text-primary)" }}
+						>
+							{provider.provider}
+						</p>
+					)}
 					<p
 						className="text-xs mt-0.5"
 						style={{ color: "var(--color-text-tertiary)" }}

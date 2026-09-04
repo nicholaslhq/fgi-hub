@@ -34,20 +34,32 @@ export function ProviderList({ providers }: { providers: ProviderScore[] }) {
 							<span
 								className={`w-2.5 h-2.5 rounded-full ${sentimentDot(p.score, p.error)}`}
 							/>
-							<div>
+						<div>
+							{p.source ? (
+								<a
+									href={p.source}
+									target="_blank"
+									rel="noopener noreferrer"
+									className="text-sm font-medium hover:underline"
+									style={{ color: "var(--color-text-primary)" }}
+								>
+									{p.provider}
+								</a>
+							) : (
 								<p className="text-sm font-medium text-text-primary">
 									{p.provider}
 								</p>
-								<p className="text-xs text-text-muted">
-									{p.error ? (
-										<span className="text-red-500">
-											{p.error}
-										</span>
-									) : (
-										<>Updated {formatTime(p.timestamp)}</>
-									)}
-								</p>
-							</div>
+							)}
+							<p className="text-xs text-text-muted">
+								{p.error ? (
+									<span className="text-red-500">
+										{p.error}
+									</span>
+								) : (
+									<>Updated {formatTime(p.timestamp)}</>
+								)}
+							</p>
+						</div>
 						</div>
 						<div className="text-right">
 							<p

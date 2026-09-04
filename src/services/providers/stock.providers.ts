@@ -22,6 +22,7 @@ export const cnnFearGreed = async (): Promise<ProviderScore> => {
 		label: sentimentLabel(score),
 		timestamp: timestamp(Math.floor(Math.random() * 5)),
 		confidence: 0.85 + Math.random() * 0.1,
+		source: "https://www.cnn.com/markets/fear-and-greed",
 		metadata: { source: "cnn_fear_greed", market: "stock" },
 	};
 };
@@ -37,6 +38,7 @@ export const marketVane = async (): Promise<ProviderScore> => {
 		label: sentimentLabel(score),
 		timestamp: timestamp(Math.floor(Math.random() * 10)),
 		confidence: 0.7 + Math.random() * 0.2,
+		source: "http://www.marketvane.net/",
 		metadata: { source: "market_vane", market: "stock" },
 	};
 };
@@ -74,6 +76,7 @@ export const putCall = async (): Promise<ProviderScore> => {
 		label: sentimentLabel(score),
 		timestamp: timestamp(Math.floor(Math.random() * 7)),
 		confidence: 0.6 + Math.random() * 0.25,
+		source: "https://www.cboe.com/us/options/market_statistics/daily/",
 		metadata: { source: "put_call_ratio", market: "stock" },
 	};
 };

@@ -22,6 +22,7 @@ export const alternativeMe = async (): Promise<ProviderScore> => {
 		label: sentimentLabel(score),
 		timestamp: timestamp(Math.floor(Math.random() * 4)),
 		confidence: 0.8 + Math.random() * 0.15,
+		source: "https://alternative.me/crypto/fear-and-greed-index/",
 		metadata: { source: "alternative_me", market: "crypto" },
 	};
 };
@@ -37,6 +38,7 @@ export const coinMarketCapPlaceholder = async (): Promise<ProviderScore> => {
 		label: sentimentLabel(score),
 		timestamp: timestamp(Math.floor(Math.random() * 8)),
 		confidence: 0.7 + Math.random() * 0.2,
+		source: "https://coinmarketcap.com/charts/fear-and-greed-index/",
 		metadata: { source: "coinmarketcap_placeholder", market: "crypto" },
 	};
 };

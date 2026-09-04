@@ -185,12 +185,24 @@ function ProviderInsightRow({
 					style={{ background: statusColor }}
 				/>
 				<div>
-					<p
-						className="text-sm font-medium"
-						style={{ color: "var(--color-text-primary)" }}
-					>
-						{provider.provider}
-					</p>
+					{provider.source ? (
+						<a
+							href={provider.source}
+							target="_blank"
+							rel="noopener noreferrer"
+							className="text-sm font-medium hover:underline"
+							style={{ color: "var(--color-text-primary)" }}
+						>
+							{provider.provider}
+						</a>
+					) : (
+						<p
+							className="text-sm font-medium"
+							style={{ color: "var(--color-text-primary)" }}
+						>
+							{provider.provider}
+						</p>
+					)}
 					<p
 						className="text-xs"
 						style={{ color: "var(--color-text-tertiary)" }}
