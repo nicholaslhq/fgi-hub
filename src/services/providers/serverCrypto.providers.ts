@@ -71,45 +71,6 @@ export async function fetchAlternativeMe(): Promise<ProviderScore> {
 	};
 }
 
-export async function fetchQiaobax(): Promise<ProviderScore> {
-	const url = "https://qiaobax.com/api/fng";
-	const data = (await fetchJson(url)) as {
-		value?: number;
-		labelEn?: string;
-		labelZh?: string;
-		updatedAt?: string;
-		ts?: number;
-	};
-
-	if (data.value === undefined) {
-		throw new Error("Qiaobax: missing value");
-	}
-
-	const score = Math.round(data.value);
-	let timestamp: string;
-	if (data.ts) {
-		timestamp = new Date(data.ts * 1000).toISOString();
-	} else if (data.updatedAt) {
-		timestamp = new Date(data.updatedAt).toISOString();
-	} else {
-		timestamp = new Date().toISOString();
-	}
-
-	return {
-		provider: "Qiaobax",
-		score,
-		label: sentimentLabel(score),
-		timestamp,
-		confidence: 0.9,
-		market: "crypto",
-		source: "https://qiaobax.com/api/fng",
-		method: "api_json",
-		retrievedAt: new Date().toISOString(),
-		freshness: "realtime",
-		metadata: { source: "qiaobax", labelEn: data.labelEn, labelZh: data.labelZh },
-	};
-}
-
 export async function fetchFearGreedChartCrypto(): Promise<ProviderScore> {
 	const url = "https://crypto.feargreedchart.com/api/?action=crypto";
 	const data = (await fetchJson(url)) as {
@@ -373,20 +334,18 @@ export async function fetchCoinMarketCapFgi(): Promise<ProviderScore> {
 
 export const serverCryptoProviders: Array<() => Promise<ProviderScore>> = [
 	fetchAlternativeMe,
-	fetchQiaobax,
+	fetchCoinMarketCapFgi,
 	fetchFearGreedChartCrypto,
 	fetchFearGreedMeterCrypto,
 	fetchCfgiCrypto,
-	fetchCoinMarketCapFgi,
 ];
 
 export const cryptoProviderNames = [
 	"Alternative.me",
-	"Qiaobax",
+	"CoinMarketCap",
 	"FearGreedChart (Crypto)",
 	"FearGreedMeter (Crypto)",
 	"CFGI (Crypto)",
-	"CoinMarketCap",
 ];
 
 export function getCryptoMarket(): Market {

@@ -277,16 +277,16 @@ export async function fetchCfgiStock(): Promise<ProviderScore> {
 
 export const serverStockProviders: Array<() => Promise<ProviderScore>> = [
 	fetchCnnFearGreed,
-	fetchFearGreedChartStock,
 	fetchCboePutCallRatio,
+	fetchFearGreedChartStock,
 	fetchFearGreedMeterStock,
 	fetchCfgiStock,
 ];
 
 export const stockProviderNames = [
 	"CNN Fear & Greed",
-	"FearGreedChart (Stock)",
 	"CBOE Put/Call Ratio",
+	"FearGreedChart (Stock)",
 	"FearGreedMeter (Stock)",
 	"CFGI (Stock)",
 ];
