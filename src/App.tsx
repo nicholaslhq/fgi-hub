@@ -407,13 +407,6 @@ function AppContent() {
 						>
 							Aggregating sentiment data...
 						</p>
-						<p
-							className="text-sm mt-2"
-							style={{ color: "var(--color-text-tertiary)" }}
-						>
-							Querying {stock?.providerCount ?? 0} stock +{" "}
-							{crypto?.providerCount ?? 0} crypto providers
-						</p>
 					</div>
 				</div>
 			);
