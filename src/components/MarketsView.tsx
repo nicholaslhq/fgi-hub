@@ -519,12 +519,40 @@ export function MarketSection({
 						className="card animate-fade-in"
 						style={{ animationDelay: "0.2s" }}
 					>
-						<h3
-							className="text-xs font-semibold uppercase tracking-widest mb-4"
-							style={{ color: "var(--color-text-tertiary)" }}
-						>
-							Provider Breakdown
-						</h3>
+						<div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3 mb-4">
+							<h3
+								className="text-xs font-semibold uppercase tracking-widest"
+								style={{ color: "var(--color-text-tertiary)" }}
+							>
+								Provider Breakdown
+							</h3>
+							<div
+								className="flex items-center gap-4 text-xs"
+								style={{ color: "var(--color-text-tertiary)" }}
+							>
+								<span className="flex items-center gap-1.5">
+									<span
+										className="w-2 h-2 rounded-full"
+										style={{ background: "var(--color-greed)" }}
+									/>
+									Active
+								</span>
+								<span className="flex items-center gap-1.5">
+									<span
+										className="w-2 h-2 rounded-full"
+										style={{ background: "var(--color-neutral)" }}
+									/>
+									Stale
+								</span>
+								<span className="flex items-center gap-1.5">
+									<span
+										className="w-2 h-2 rounded-full"
+										style={{ background: "var(--color-fear)" }}
+									/>
+									Error
+								</span>
+							</div>
+						</div>
 						<div>
 							{providers.map((p) => (
 								<ProviderInsightRow
