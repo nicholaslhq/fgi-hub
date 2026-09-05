@@ -25,8 +25,8 @@ export function SystemStatus({
 	const isRefreshing = !lastRefreshed;
 
 	return (
-		<div className="flex flex-col items-center sm:flex-row sm:items-center justify-between gap-4 py-2 px-1">
-			<div className="flex flex-wrap items-center gap-4 sm:gap-6">
+		<div className="flex flex-col items-center sm:flex-row sm:items-center sm:justify-between gap-4 py-2 px-1">
+			<div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6 w-full sm:w-auto">
 				<div className="flex items-center gap-2">
 					<div
 						className="w-2 h-2 rounded-full"
@@ -47,15 +47,22 @@ export function SystemStatus({
 					</span>
 				</div>
 				<div
-					className="hidden sm:flex items-center gap-4 text-xs"
+					className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-[11px] sm:text-xs sm:justify-start sm:gap-4 w-full sm:w-auto"
 					style={{ color: "var(--color-text-tertiary)" }}
 				>
 					<span>{totalProviders} providers</span>
-					<span style={{ color: "var(--color-border)" }}>|</span>
+					<span
+						style={{ color: "var(--color-border)" }}
+					>
+						|
+					</span>
 					<span>{activeProviders} active</span>
 					{staleProviders > 0 && (
 						<>
-							<span style={{ color: "var(--color-border)" }}>
+							<span
+								className="hidden sm:inline"
+								style={{ color: "var(--color-border)" }}
+							>
 								|
 							</span>
 							<span>{staleProviders} stale</span>
@@ -63,7 +70,10 @@ export function SystemStatus({
 					)}
 					{failedProviders > 0 && (
 						<>
-							<span style={{ color: "var(--color-border)" }}>
+							<span
+								className="hidden sm:inline"
+								style={{ color: "var(--color-border)" }}
+							>
 								|
 							</span>
 							<span>{failedProviders} failed</span>
