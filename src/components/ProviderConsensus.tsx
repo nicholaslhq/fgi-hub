@@ -1,6 +1,7 @@
 import type { ConsensusResult } from "../types";
 import { formatStrategyName } from "../utils/formatters";
 import { isStale } from "../utils/time";
+import { countProviders } from "../utils/providerCounts";
 import { useTimeTicker } from "../hooks/useTimeTicker";
 import { ProviderRow } from "./SentimentSpectrum";
 
@@ -16,10 +17,10 @@ export function ProviderConsensus({
 	useTimeTicker();
 
 	const activeScores = data.providers
-		.filter((p) => !p.error)
+		.filter((p) => !p.error && !isStale(p.timestamp))
 		.map((p) => p.score);
-	const min = Math.min(...activeScores);
-	const max = Math.max(...activeScores);
+	const min = activeScores.length > 0 ? Math.min(...activeScores) : 0;
+	const max = activeScores.length > 0 ? Math.max(...activeScores) : 0;
 	const spread = max - min;
 	const divergence = spread > 30 ? "high" : spread > 15 ? "medium" : "low";
 
@@ -35,11 +36,8 @@ export function ProviderConsensus({
 		low: "var(--color-greed)",
 	};
 
-	const errorCount = data.providers.filter((p) => p.error).length;
-	const staleCount = data.providers.filter(
-		(p) => !p.error && isStale(p.timestamp),
-	).length;
-	const activeCount = data.providers.length - errorCount - staleCount;
+	const { active: activeCount, stale: staleCount, failed: errorCount } =
+		countProviders(data.providers);
 	const confidencePct =
 		data.confidence !== undefined ? Math.round(data.confidence * 100) : 0;
 

@@ -1,4 +1,5 @@
 import type { ConsensusResult } from "../types";
+import { countProviders } from "../utils/providerCounts";
 
 export function SystemStatus({
 	stock,
@@ -9,12 +10,17 @@ export function SystemStatus({
 	crypto: ConsensusResult | null;
 	lastRefreshed: string | null;
 }) {
+	const stockCounts = stock ? countProviders(stock.providers) : null;
+	const cryptoCounts = crypto ? countProviders(crypto.providers) : null;
+
 	const totalProviders =
-		(stock?.providers.length ?? 0) + (crypto?.providers.length ?? 0);
-	const failedProviders = [
-		...(stock?.providers.filter((p) => p.error) ?? []),
-		...(crypto?.providers.filter((p) => p.error) ?? []),
-	].length;
+		(stockCounts?.total ?? 0) + (cryptoCounts?.total ?? 0);
+	const activeProviders =
+		(stockCounts?.active ?? 0) + (cryptoCounts?.active ?? 0);
+	const staleProviders =
+		(stockCounts?.stale ?? 0) + (cryptoCounts?.stale ?? 0);
+	const failedProviders =
+		(stockCounts?.failed ?? 0) + (cryptoCounts?.failed ?? 0);
 
 	const isRefreshing = !lastRefreshed;
 
@@ -46,15 +52,21 @@ export function SystemStatus({
 				>
 					<span>{totalProviders} providers</span>
 					<span style={{ color: "var(--color-border)" }}>|</span>
-					<span>{totalProviders - failedProviders} active</span>
+					<span>{activeProviders} active</span>
+					{staleProviders > 0 && (
+						<>
+							<span style={{ color: "var(--color-border)" }}>
+								|
+							</span>
+							<span>{staleProviders} stale</span>
+						</>
+					)}
 					{failedProviders > 0 && (
 						<>
 							<span style={{ color: "var(--color-border)" }}>
 								|
 							</span>
-							<span style={{ color: "var(--color-fear)" }}>
-								{failedProviders} failed
-							</span>
+							<span>{failedProviders} failed</span>
 						</>
 					)}
 				</div>
