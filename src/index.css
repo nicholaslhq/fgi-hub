@@ -344,7 +344,6 @@ body {
 
 .status-dot.stale {
 	background: var(--color-neutral);
-	animation: pulse-soft 2s ease-in-out infinite;
 }
 
 .status-dot.error {

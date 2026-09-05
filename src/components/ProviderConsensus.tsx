@@ -1,12 +1,8 @@
 import type { ConsensusResult } from "../types";
 import { formatStrategyName } from "../utils/formatters";
+import { isStale } from "../utils/time";
+import { useTimeTicker } from "../hooks/useTimeTicker";
 import { ProviderRow } from "./SentimentSpectrum";
-
-const STALE_THRESHOLD_MS = 15 * 60_000;
-
-function isStale(timestamp: string): boolean {
-	return Date.now() - new Date(timestamp).getTime() > STALE_THRESHOLD_MS;
-}
 
 export function ProviderConsensus({
 	data,
@@ -17,6 +13,8 @@ export function ProviderConsensus({
 	market: "stock" | "crypto";
 	theme: "light" | "dark";
 }) {
+	useTimeTicker();
+
 	const activeScores = data.providers
 		.filter((p) => !p.error)
 		.map((p) => p.score);

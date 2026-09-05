@@ -1,5 +1,6 @@
 import type React from "react";
 import type { ProviderScore } from "../types";
+import { isStale } from "../utils/time";
 
 export function getSentimentColor(
 	score: number,
@@ -139,19 +140,22 @@ export function ProviderRow({
 	theme: "light" | "dark";
 }) {
 	const hasError = !!provider.error;
-	const color = hasError
+	const stale = !hasError && isStale(provider.timestamp);
+	const color = stale
 		? theme === "dark"
+			? "rgb(250, 204, 21)"
+			: "rgb(202, 138, 4)"
+		: hasError
 			? "rgb(156, 163, 175)"
-			: "rgb(156, 163, 175)"
-		: getSentimentColor(provider.score, theme);
-	const status = hasError ? "error" : "healthy";
+			: getSentimentColor(provider.score, theme);
+	const status = hasError ? "error" : stale ? "stale" : "healthy";
 
 	return (
 		<div className="provider-row">
 			<div className="flex items-center gap-3 sm:gap-4 flex-1 min-w-0">
 				<div
 					className={`status-dot ${status}`}
-					title={provider.error || "Healthy"}
+					title={provider.error || (stale ? "Stale" : "Healthy")}
 				/>
 				<div className="min-w-0">
 					{provider.source ? (

@@ -7,6 +7,8 @@ import {
 import { getSentimentColor } from "./SentimentSpectrum";
 import { sentimentLabel } from "../utils/sentiment";
 import { AutoFitText } from "./AutoFitText";
+import { isStale } from "../utils/time";
+import { useTimeTicker } from "../hooks/useTimeTicker";
 
 function mean(values: number[]): number {
 	return Math.round(values.reduce((a, b) => a + b, 0) / values.length);
@@ -167,12 +169,12 @@ function ProviderInsightRow({
 }: {
 	provider: ConsensusResult["providers"][0];
 }) {
-	const statusColor = useMemo(() => {
-		if (provider.error) return "var(--color-fear)";
-		return Date.now() - new Date(provider.timestamp).getTime() > 15 * 60_000
+	useTimeTicker();
+	const statusColor = provider.error
+		? "var(--color-fear)"
+		: isStale(provider.timestamp)
 			? "var(--color-neutral)"
 			: "var(--color-greed)";
-	}, [provider.error, provider.timestamp]);
 
 	return (
 		<div
@@ -234,6 +236,7 @@ function ProviderInsightRow({
 }
 
 function Insights({ data }: { data: ConsensusResult }) {
+	useTimeTicker();
 	const providers = data.providers.filter((p) => !p.error);
 	const scores = providers.map((p) => p.score);
 	const sd = stdDev(scores);
@@ -250,15 +253,9 @@ function Insights({ data }: { data: ConsensusResult }) {
 			}
 		: null;
 
-	const staleCount = useMemo(
-		() =>
-			data.providers.filter(
-				(p) =>
-					!p.error &&
-					Date.now() - new Date(p.timestamp).getTime() > 15 * 60_000,
-			).length,
-		[data.providers],
-	);
+ 	const staleCount = data.providers.filter(
+ 		(p) => !p.error && isStale(p.timestamp),
+ 	).length;
 	const errorCount = data.providers.filter((p) => p.error).length;
 
 	const strategyLabel = (s: string) =>
