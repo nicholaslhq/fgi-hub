@@ -177,14 +177,14 @@ describe("computeConfidence", () => {
 	};
 
 	it("returns 0 for n=0", () => {
-		expect(computeConfidence({ ...base, n: 0 })).toBe(0);
+		expect(computeConfidence({ ...base, n: 0 }, 50, 50)).toBe(0);
 	});
 	it("returns positive value for n=1", () => {
-		expect(computeConfidence({ ...base, n: 1 })).toBeGreaterThan(0);
+		expect(computeConfidence({ ...base, n: 1 }, 50, 50)).toBeGreaterThan(0);
 	});
 	it("returns higher confidence for more providers", () => {
-		const c5 = computeConfidence({ ...base, n: 5, effectiveN: 4 });
-		const c20 = computeConfidence({ ...base, n: 20, effectiveN: 16 });
+		const c5 = computeConfidence({ ...base, n: 5, effectiveN: 4 }, 50, 50);
+		const c20 = computeConfidence({ ...base, n: 20, effectiveN: 16 }, 50, 50);
 		expect(c20).toBeGreaterThan(c5);
 	});
 	it("returns lower confidence with outliers", () => {
@@ -193,18 +193,18 @@ describe("computeConfidence", () => {
 			n: 5,
 			outlierRatio: 0,
 			robustCV: 0.1,
-		});
+		}, 50, 50);
 		const withOutliers = computeConfidence({
 			...base,
 			n: 5,
 			outlierRatio: 0.4,
 			robustCV: 0.1,
-		});
+		}, 50, 50);
 		expect(withOutliers).toBeLessThan(clean);
 	});
 	it("returns lower confidence with high dispersion", () => {
-		const clean = computeConfidence({ ...base, robustCV: 0.05 });
-		const dispersed = computeConfidence({ ...base, robustCV: 0.3 });
+		const clean = computeConfidence({ ...base, robustCV: 0.05 }, 50, 50);
+		const dispersed = computeConfidence({ ...base, robustCV: 0.3 }, 50, 50);
 		expect(dispersed).toBeLessThan(clean);
 	});
 	it("returns value in [0, 1]", () => {
@@ -214,7 +214,7 @@ describe("computeConfidence", () => {
 			outlierRatio: 0.5,
 			robustCV: 0.5,
 			meanProviderConfidence: 0.3,
-		});
+		}, 50, 50);
 		expect(c).toBeGreaterThanOrEqual(0);
 		expect(c).toBeLessThanOrEqual(1);
 	});

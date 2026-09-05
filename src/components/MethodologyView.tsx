@@ -538,9 +538,9 @@ export function MethodologyView() {
 					/>
 					<MetricDoc
 						name="Confidence"
-						definition="A data quality score (0–1) reflecting how reliable the consensus is. It multiplies six normalized signals: sample size, dispersion, outlier penalty, mean provider confidence, effective sample size, and stability."
-						calculation="confidence = clamp( [n/(n+2)] × [1−robustCV] × [1−2×outlierRatio] × meanProviderConfidence × [effectiveN/n] × stabilityFactor, 0, 1 )"
-						interpretation="&gt;0.70 = high confidence; the consensus is likely accurate. 0.45–0.70 = moderate confidence; treat the score as directional. &lt;0.45 = low confidence; the consensus may be unreliable due to small sample, high disagreement, or stale data."
+						definition="A composite score (0–1) reflecting how reliable the consensus is. It combines the confidence interval width (primary signal, 60%), provider self-reported confidence (25%), and data quality metrics (15%)."
+						calculation="confidence = clamp( [ciScore×0.60 + meanProviderConfidence×0.25 + qualityComposite×0.15], 0, 1 ), where ciScore = 1 - (ciUpper-ciLower)/100 and qualityComposite = sizeQuality×0.15 + dispersionQuality×0.35 + outlierQuality×0.25 + effectiveNQuality×0.25."
+						interpretation=">0.70 = high confidence; the consensus is likely accurate. 0.45–0.70 = moderate confidence; treat the score as directional. <0.45 = low confidence; the consensus may be unreliable due to small sample, high disagreement, or stale data."
 					/>
 					<MetricDoc
 						name="95% Confidence Interval (CI)"

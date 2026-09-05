@@ -376,7 +376,11 @@ function computeScore(
 	return Math.round(clamp(score, 0, 100));
 }
 
-function computeConfidence(q: QualityMetrics): number {
+function computeConfidence(
+	q: QualityMetrics,
+	ciLower: number,
+	ciUpper: number,
+): number {
 	if (q.n === 0) return 0;
 	if (q.n === 1) {
 		return clamp(
@@ -386,21 +390,37 @@ function computeConfidence(q: QualityMetrics): number {
 		);
 	}
 
-	const sizeFactor = q.n / (q.n + 2);
-	const dispersionFactor = 1 - clamp(q.robustCV, 0, 1);
-	const outlierPenalty = 1 - clamp(q.outlierRatio * 2, 0, 0.8);
-	const confidenceFactor = clamp(q.meanProviderConfidence, 0, 1);
-	const effectiveNFactor = Math.min(q.effectiveN / Math.max(q.n, 1), 1);
-	const stabilityFactor =
-		q.robustCV > 0 ? clamp(1 - q.robustCV * 0.5, 0.3, 1) : 1;
+	const ciWidth = ciUpper - ciLower;
+	const normalizedWidth = ciWidth / 100;
+	const ciScore = Math.max(0, 1 - normalizedWidth);
 
-	const raw =
-		sizeFactor *
-		dispersionFactor *
-		outlierPenalty *
-		confidenceFactor *
-		effectiveNFactor *
-		stabilityFactor;
+	const base = q.meanProviderConfidence;
+
+	const sizeQuality = q.n >= 7 ? 1.0 : q.n >= 3 ? 0.85 : 0.6;
+	const dispersionQuality =
+		q.robustCV <= 0.1
+			? 1.0
+			: q.robustCV <= 0.25
+				? 0.8
+				: 0.5;
+	const outlierQuality =
+		q.outlierRatio === 0
+			? 1.0
+			: q.outlierRatio <= 0.2
+				? 0.8
+				: 0.5;
+	const effectiveNQuality = Math.max(
+		0.5,
+		Math.min(1, q.effectiveN / Math.max(q.n, 1)),
+	);
+
+	const qualityComposite =
+		sizeQuality * 0.15 +
+		dispersionQuality * 0.35 +
+		outlierQuality * 0.25 +
+		effectiveNQuality * 0.25;
+
+	const raw = (ciScore * 0.6 + base * 0.25 + qualityComposite * 0.15);
 
 	return clamp(raw, 0, 1);
 }
@@ -490,7 +510,21 @@ export function aggregate(
 	const strategy = selectStrategy(quality);
 
 	const rawScore = computeScore(strategy, estimators, weighted);
-	const confidence = computeConfidence(quality);
+
+	const preliminaryCI = computeConfidenceInterval(
+		rawScore,
+		weighted,
+		normWeights,
+		strategy,
+		medianVal,
+		mad,
+		quality.effectiveN,
+	);
+	const confidence = computeConfidence(
+		quality,
+		preliminaryCI.ciLower,
+		preliminaryCI.ciUpper,
+	);
 	const score = applyTemporalSmoothing(rawScore, confidence, previousScore);
 
 	const { ciLower, ciUpper } = computeConfidenceInterval(
