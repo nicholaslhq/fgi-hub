@@ -1,0 +1,1 @@
+declare const __FGI_DATA_MODE__: string;

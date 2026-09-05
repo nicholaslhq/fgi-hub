@@ -4,12 +4,10 @@ import { defineConfig } from "vitest/config";
 import type { Plugin } from "vite";
 import type { IncomingMessage, ServerResponse } from "node:http";
 
-function serverMiddleware(): Plugin {
+function serverMiddleware(dataMode: string): Plugin {
 	return {
 		name: "fgi-hub:server-middleware",
 		configureServer(server) {
-			const dataMode = process.env.FGI_DATA_MODE || "mock";
-
 			if (dataMode === "prod") {
 				server.middlewares.use(
 					"/api",
@@ -63,8 +61,13 @@ function serverMiddleware(): Plugin {
 	};
 }
 
+const dataMode = process.env.FGI_DATA_MODE || "mock";
+
 export default defineConfig({
-	plugins: [react(), tailwindcss(), serverMiddleware()],
+	plugins: [react(), tailwindcss(), serverMiddleware(dataMode)],
+	define: {
+		__FGI_DATA_MODE__: JSON.stringify(dataMode),
+	},
 	test: {
 		environment: "node",
 		include: ["src/**/*.test.ts"],

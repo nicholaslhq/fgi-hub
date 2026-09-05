@@ -195,8 +195,7 @@ function getAggregatedSentiment(
 	const cryptoConfScaled = Math.round(crypto.confidence * 1000);
 	const totalConfScaled = stockConfScaled + cryptoConfScaled;
 	const numerator =
-		2 *
-			(stock.score * stockConfScaled + crypto.score * cryptoConfScaled) +
+		2 * (stock.score * stockConfScaled + crypto.score * cryptoConfScaled) +
 		50 * crossMarketShrinkage * 1000;
 	const denominator = 2 * totalConfScaled + crossMarketShrinkage * 1000;
 	const aggregatedScore = Math.round(numerator / denominator);
@@ -828,7 +827,7 @@ function AppContent() {
 			</main>
 
 			<footer
-				className="py-4 sm:py-6 px-6 sm:px-8 lg:px-12"
+				className="py-4 sm:py-8 px-6 sm:px-8 lg:px-12"
 				style={{
 					borderTop: "1px solid var(--color-border)",
 					background: "var(--color-bg-raised)",
@@ -864,8 +863,9 @@ function AppContent() {
 							className="text-xs"
 							style={{ color: "var(--color-text-tertiary)" }}
 						>
-							Uses mock data for initial development. Data is
-							simulated and not from live APIs.
+							{__FGI_DATA_MODE__ === "prod"
+								? "Using live production data from external APIs."
+								: "Uses mock data for initial development. Data is simulated and not from live APIs."}
 						</p>
 					</div>
 				</div>
