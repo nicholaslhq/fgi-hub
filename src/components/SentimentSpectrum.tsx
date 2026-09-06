@@ -137,10 +137,11 @@ export function ProviderRow({
 		? theme === "dark"
 			? "rgb(250, 204, 21)"
 			: "rgb(202, 138, 4)"
-		: hasError
-			? "rgb(156, 163, 175)"
-			: getSentimentColor(provider.score, theme);
+		: getSentimentColor(provider.score, theme);
 	const status = hasError ? "error" : stale ? "stale" : "healthy";
+
+	const titleClassName = "text-sm font-medium truncate no-underline";
+	const titleStyle = { color: "var(--color-text-primary)" };
 
 	return (
 		<div className="provider-row">
@@ -155,16 +156,13 @@ export function ProviderRow({
 							href={provider.source}
 							target="_blank"
 							rel="noopener noreferrer"
-							className="text-sm font-medium truncate hover:underline"
-							style={{ color: "var(--color-text-primary)" }}
+							className={titleClassName}
+							style={titleStyle}
 						>
 							{provider.provider}
 						</a>
 					) : (
-						<p
-							className="text-sm font-medium truncate"
-							style={{ color: "var(--color-text-primary)" }}
-						>
+						<p className={titleClassName} style={titleStyle}>
 							{provider.provider}
 						</p>
 					)}
@@ -183,15 +181,17 @@ export function ProviderRow({
 				</div>
 			</div>
 			<div className="flex items-center gap-3 sm:gap-4">
-				<div className="provider-bar-track hidden sm:block">
-					<div
-						className="provider-bar-fill"
-						style={{
-							width: hasError ? "0%" : `${provider.score}%`,
-							backgroundColor: color,
-						}}
-					/>
-				</div>
+				{!hasError && (
+					<div className="provider-bar-track hidden sm:block">
+						<div
+							className="provider-bar-fill"
+							style={{
+								width: `${provider.score}%`,
+								backgroundColor: color,
+							}}
+						/>
+					</div>
+				)}
 				<div className="text-right w-14 sm:w-16">
 					<p
 						className="font-mono text-sm font-semibold"

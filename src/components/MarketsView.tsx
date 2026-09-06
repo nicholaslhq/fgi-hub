@@ -4,7 +4,7 @@ import {
 	formatStrategyName,
 	formatStrategyDescription,
 } from "../utils/formatters";
-import { getSentimentColor } from "./SentimentSpectrum";
+import { getSentimentColor, ProviderRow } from "./SentimentSpectrum";
 import { sentimentLabel } from "../utils/sentiment";
 import { AutoFitText } from "./AutoFitText";
 import { isStale } from "../utils/time";
@@ -161,79 +161,6 @@ function MetricCard({
 					{sub}
 				</p>
 			)}
-		</div>
-	);
-}
-
-function ProviderInsightRow({
-	provider,
-}: {
-	provider: ConsensusResult["providers"][0];
-}) {
-	useTimeTicker();
-	const statusColor = provider.error
-		? "var(--color-fear)"
-		: isStale(provider.timestamp)
-			? "var(--color-neutral)"
-			: "var(--color-greed)";
-
-	return (
-		<div
-			className="flex items-center justify-between py-3 border-b last:border-0"
-			style={{ borderColor: "var(--color-border-subtle)" }}
-		>
-			<div className="flex items-center gap-3">
-				<div
-					className="w-1.5 h-1.5 rounded-full"
-					style={{ background: statusColor }}
-				/>
-				<div>
-					{provider.source ? (
-						<a
-							href={provider.source}
-							target="_blank"
-							rel="noopener noreferrer"
-							className="text-sm font-medium hover:underline"
-							style={{ color: "var(--color-text-primary)" }}
-						>
-							{provider.provider}
-						</a>
-					) : (
-						<p
-							className="text-sm font-medium"
-							style={{ color: "var(--color-text-primary)" }}
-						>
-							{provider.provider}
-						</p>
-					)}
-					<p
-						className="text-xs"
-						style={{ color: "var(--color-text-tertiary)" }}
-					>
-						{provider.error ? (
-						provider.error
-					) : (
-						<Timestamp iso={provider.timestamp} size="xs" />
-					)}
-					</p>
-				</div>
-			</div>
-			<div className="text-right">
-				<p
-					className="text-sm font-bold font-mono"
-					style={{ color: "var(--color-text-primary)" }}
-				>
-					{provider.error ? "—" : provider.score}
-				</p>
-				{provider.confidence && !provider.error ? (
-					<p
-						className="text-xs"
-						style={{ color: "var(--color-text-tertiary)" }}
-					>
-						{(provider.confidence * 100).toFixed(0)}% confidence
-					</p>
-				) : null}
-			</div>
 		</div>
 	);
 }
@@ -568,9 +495,10 @@ export function MarketSection({
 						</div>
 						<div>
 							{providers.map((p) => (
-								<ProviderInsightRow
+								<ProviderRow
 									key={p.provider}
 									provider={p}
+									theme={theme}
 								/>
 							))}
 						</div>
