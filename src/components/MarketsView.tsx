@@ -4,12 +4,13 @@ import {
 	formatStrategyName,
 	formatStrategyDescription,
 } from "../utils/formatters";
-import { getSentimentColor, ProviderRow } from "./SentimentSpectrum";
+import { getSentimentColor } from "./SentimentSpectrum";
 import { sentimentLabel } from "../utils/sentiment";
 import { AutoFitText } from "./AutoFitText";
 import { isStale } from "../utils/time";
 import { useTimeTicker } from "../hooks/useTimeTicker";
 import { Timestamp } from "./Timestamp";
+import { ProviderBreakdown } from "./ProviderBreakdown";
 
 function mean(values: number[]): number {
 	return Math.round(values.reduce((a, b) => a + b, 0) / values.length);
@@ -453,56 +454,9 @@ export function MarketSection({
 						<DistributionBar providers={providers} theme={theme} />
 					</div>
 
-					<Insights data={data} />
+				<Insights data={data} />
 
-					<div
-						className="card animate-fade-in"
-						style={{ animationDelay: "0.2s" }}
-					>
-						<div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3 mb-4">
-							<h3
-								className="text-xs font-semibold uppercase tracking-widest"
-								style={{ color: "var(--color-text-tertiary)" }}
-							>
-								Provider Breakdown
-							</h3>
-							<div
-								className="flex items-center gap-4 text-xs"
-								style={{ color: "var(--color-text-tertiary)" }}
-							>
-								<span className="flex items-center gap-3">
-									<span
-										className="w-1.5 h-1.5 rounded-full"
-										style={{ background: "var(--color-greed)" }}
-									/>
-									Active
-								</span>
-								<span className="flex items-center gap-3">
-									<span
-										className="w-1.5 h-1.5 rounded-full"
-										style={{ background: "var(--color-neutral)" }}
-									/>
-									Stale
-								</span>
-								<span className="flex items-center gap-3">
-									<span
-										className="w-1.5 h-1.5 rounded-full"
-										style={{ background: "var(--color-fear)" }}
-									/>
-									Error
-								</span>
-							</div>
-						</div>
-						<div>
-							{providers.map((p) => (
-								<ProviderRow
-									key={p.provider}
-									provider={p}
-									theme={theme}
-								/>
-							))}
-						</div>
-					</div>
+				<ProviderBreakdown data={data} theme={theme} />
 				</>
 			) : (
 				<div
