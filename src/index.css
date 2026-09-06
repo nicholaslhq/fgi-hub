@@ -314,6 +314,63 @@ body {
 	background: var(--color-bg-sunken);
 }
 
+.provider-link {
+	position: relative;
+	color: var(--color-text-primary);
+	text-decoration: none;
+	transition: color 0.2s ease;
+	display: inline-flex;
+	align-items: center;
+	gap: 4px;
+}
+
+.provider-link-text {
+	transition: color 0.2s ease;
+}
+
+.provider-link-icon {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	opacity: 0;
+	transform: translate(-4px, 2px);
+	transition:
+		opacity 0.2s ease,
+		transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+	color: var(--color-text-tertiary);
+}
+
+.provider-link:hover {
+	color: var(--color-accent);
+}
+
+.provider-link:hover .provider-link-text {
+	color: var(--color-accent);
+}
+
+.provider-link:hover .provider-link-icon {
+	opacity: 1;
+	transform: translate(0, 0);
+}
+
+.provider-link::after {
+	content: "";
+	position: absolute;
+	left: 0;
+	right: 0;
+	bottom: -2px;
+	height: 2px;
+	background: var(--color-accent);
+	border-radius: 1px;
+	transform: scaleX(0);
+	transform-origin: center;
+	transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.provider-link:hover::after {
+	transform: scaleX(1);
+}
+
 .provider-bar-track {
 	flex: 1;
 	height: 4px;
