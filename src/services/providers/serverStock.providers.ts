@@ -1,6 +1,7 @@
 import type { ProviderScore, Market } from "../../types/index.js";
 import { sentimentLabel } from "../../utils/sentiment.js";
 import { providerError } from "../../utils/errors.js";
+import { parseCfgiTimestamp } from "../../utils/time.js";
 
 const TIMEOUT_MS = 10000;
 
@@ -292,14 +293,7 @@ export async function fetchCfgiStock(): Promise<ProviderScore> {
 	const classification = classMatch?.[1]?.trim();
 	const metaText = metaMatch?.[1]?.trim() ?? "";
 
-	const dateMatch = metaText.match(/as of (.+)$/);
-	let timestamp = new Date().toISOString();
-	if (dateMatch) {
-		const parsed = new Date(dateMatch[1].trim() + " UTC");
-		if (!Number.isNaN(parsed.getTime())) {
-			timestamp = parsed.toISOString();
-		}
-	}
+	const timestamp = parseCfgiTimestamp(metaText);
 
 	return {
 		provider: "CFGI (Stock)",

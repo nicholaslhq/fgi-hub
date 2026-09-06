@@ -22,6 +22,40 @@ export interface TimestampDisplay {
 	tier: TimestampTier;
 }
 
+const CFGI_MONTHS = [
+	"Jan", "Feb", "Mar", "Apr", "May", "Jun",
+	"Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
+];
+
+export function parseCfgiTimestamp(
+	metaText: string,
+	fallback: string = new Date().toISOString(),
+): string {
+	const dateMatch = metaText.match(/as of (.+)$/);
+	if (!dateMatch) return fallback;
+
+	const dateStr = dateMatch[1].trim();
+	const parts = dateStr.match(/(\d{1,2}) (\w{3}), (\d{2}):(\d{2})/);
+	if (!parts) return fallback;
+
+	const month = CFGI_MONTHS.indexOf(parts[2]);
+	if (month < 0) return fallback;
+
+	const day = parseInt(parts[1], 10);
+	const hour = parseInt(parts[3], 10);
+	const minute = parseInt(parts[4], 10);
+	const year = new Date().getFullYear();
+
+	const parsed = new Date(Date.UTC(year, month, day, hour, minute));
+	if (Number.isNaN(parsed.getTime())) return fallback;
+
+	if (parsed.getTime() > Date.now() + 24 * 60 * 60_000) {
+		parsed.setUTCFullYear(year - 1);
+	}
+
+	return parsed.toISOString();
+}
+
 export function formatTimestamp(
 	timestamp: string,
 	now: number = Date.now(),
