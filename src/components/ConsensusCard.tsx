@@ -1,4 +1,5 @@
 import type { ConsensusResult } from "../types";
+import { Timestamp } from "./Timestamp";
 
 function sentimentTextColor(score: number): string {
 	if (score <= 20) return "text-fear-extreme";
@@ -6,15 +7,6 @@ function sentimentTextColor(score: number): string {
 	if (score <= 60) return "text-neutral";
 	if (score <= 80) return "text-greed";
 	return "text-greed-extreme";
-}
-
-function formatTime(iso: string): string {
-	const d = new Date(iso);
-	return d.toLocaleTimeString([], {
-		hour: "2-digit",
-		minute: "2-digit",
-		second: "2-digit",
-	});
 }
 
 export function ConsensusCard({
@@ -67,7 +59,7 @@ export function ConsensusCard({
 							{data.label}
 						</p>
 						<p className="text-sm text-text-muted mt-1">
-							Updated {formatTime(data.lastUpdated)}
+							<Timestamp iso={data.lastUpdated} size="xs" />
 						</p>
 						<p className="text-xs text-text-muted mt-0.5">
 							{data.providerCount} provider

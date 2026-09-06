@@ -9,6 +9,7 @@ import { sentimentLabel } from "../utils/sentiment";
 import { AutoFitText } from "./AutoFitText";
 import { isStale } from "../utils/time";
 import { useTimeTicker } from "../hooks/useTimeTicker";
+import { Timestamp } from "./Timestamp";
 
 function mean(values: number[]): number {
 	return Math.round(values.reduce((a, b) => a + b, 0) / values.length);
@@ -209,9 +210,11 @@ function ProviderInsightRow({
 						className="text-xs"
 						style={{ color: "var(--color-text-tertiary)" }}
 					>
-						{provider.error
-							? provider.error
-							: `Updated ${new Date(provider.timestamp).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" })}`}
+						{provider.error ? (
+						provider.error
+					) : (
+						<Timestamp iso={provider.timestamp} size="xs" />
+					)}
 					</p>
 				</div>
 			</div>
@@ -414,9 +417,12 @@ export function MarketSection({
 						style={{ color: "var(--color-text-tertiary)" }}
 					>
 						{data?.providerCount ?? 0} providers reporting
-						{data?.lastUpdated
-							? ` · Updated ${new Date(data.lastUpdated).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" })}`
-							: ""}
+						{data?.lastUpdated ? (
+							<>
+								{" · "}
+								<Timestamp iso={data.lastUpdated} size="xs" />
+							</>
+						) : null}
 					</p>
 				</div>
 				{data && (

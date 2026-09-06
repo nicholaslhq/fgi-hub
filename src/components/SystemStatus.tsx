@@ -1,5 +1,7 @@
 import type { ConsensusResult } from "../types";
 import { countProviders } from "../utils/providerCounts";
+import { getTimestampTier } from "../utils/time";
+import { Timestamp } from "./Timestamp";
 
 export function SystemStatus({
 	stock,
@@ -23,6 +25,25 @@ export function SystemStatus({
 		(stockCounts?.failed ?? 0) + (cryptoCounts?.failed ?? 0);
 
 	const isRefreshing = !lastRefreshed;
+	const tier = lastRefreshed ? getTimestampTier(lastRefreshed) : "fresh";
+	const isStaleData = tier === "stale";
+	const isOutdatedData = tier === "outdated";
+
+	const statusDotColor = isRefreshing
+		? "var(--color-neutral)"
+		: isOutdatedData
+			? "var(--color-fear)"
+			: isStaleData
+				? "var(--color-neutral)"
+				: "var(--color-greed)";
+
+	const statusText = isRefreshing
+		? "Awaiting data"
+		: isOutdatedData
+			? "Data outdated"
+			: isStaleData
+				? "Data stale"
+				: "System operational";
 
 	return (
 		<div className="flex flex-col items-center sm:flex-row sm:items-center sm:justify-between gap-4 py-2 px-1">
@@ -31,9 +52,7 @@ export function SystemStatus({
 					<div
 						className="w-2 h-2 rounded-full"
 						style={{
-							backgroundColor: isRefreshing
-								? "var(--color-neutral)"
-								: "var(--color-greed)",
+							backgroundColor: statusDotColor,
 							animation: isRefreshing
 								? "pulse-soft 1.5s ease-in-out infinite"
 								: "none",
@@ -41,9 +60,15 @@ export function SystemStatus({
 					/>
 					<span
 						className="text-xs font-semibold"
-						style={{ color: "var(--color-text-tertiary)" }}
+						style={{
+							color: isOutdatedData
+								? "var(--color-fear)"
+								: isStaleData
+									? "var(--color-neutral)"
+									: "var(--color-text-tertiary)",
+						}}
 					>
-						{isRefreshing ? "Awaiting data" : "System operational"}
+						{statusText}
 					</span>
 				</div>
 				<div
@@ -82,17 +107,7 @@ export function SystemStatus({
 				</div>
 			</div>
 			{lastRefreshed && (
-				<div
-					className="text-xs font-mono font-medium"
-					style={{ color: "var(--color-text-tertiary)" }}
-				>
-					Last updated:{" "}
-					{new Date(lastRefreshed).toLocaleTimeString([], {
-						hour: "2-digit",
-						minute: "2-digit",
-						second: "2-digit",
-					})}
-				</div>
+				<Timestamp iso={lastRefreshed} showDot size="xs" />
 			)}
 		</div>
 	);

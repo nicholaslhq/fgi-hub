@@ -1,6 +1,7 @@
 import type React from "react";
 import type { ProviderScore } from "../types";
-import { isStale } from "../utils/time";
+import { isStale, formatTimestamp } from "../utils/time";
+import { Timestamp } from "./Timestamp";
 
 export function getSentimentColor(
 	score: number,
@@ -117,16 +118,7 @@ export function ScoreDisplay({
 			</div>
 			<div className="flex flex-wrap items-center gap-2 sm:gap-3 mt-4">
 				<span className="market-tag">{market}</span>
-				<span
-					className="text-xs font-mono"
-					style={{ color: "var(--color-text-tertiary)" }}
-				>
-					{new Date(timestamp).toLocaleTimeString([], {
-						hour: "2-digit",
-						minute: "2-digit",
-						second: "2-digit",
-					})}
-				</span>
+				<Timestamp iso={timestamp} size="xs" showDot />
 			</div>
 		</div>
 	);
@@ -185,16 +177,7 @@ export function ProviderRow({
 								{provider.error}
 							</span>
 						) : (
-							<>
-								Updated{" "}
-								{new Date(
-									provider.timestamp,
-								).toLocaleTimeString([], {
-									hour: "2-digit",
-									minute: "2-digit",
-									second: "2-digit",
-								})}
-							</>
+							formatTimestamp(provider.timestamp).text
 						)}
 					</p>
 				</div>

@@ -1,4 +1,5 @@
 import type { ProviderScore } from "../types";
+import { Timestamp } from "./Timestamp";
 
 function sentimentDot(score: number, error?: string): string {
 	if (error) return "bg-gray-400";
@@ -7,15 +8,6 @@ function sentimentDot(score: number, error?: string): string {
 	if (score <= 60) return "bg-neutral";
 	if (score <= 80) return "bg-greed";
 	return "bg-greed-extreme";
-}
-
-function formatTime(iso: string): string {
-	const d = new Date(iso);
-	return d.toLocaleTimeString([], {
-		hour: "2-digit",
-		minute: "2-digit",
-		second: "2-digit",
-	});
 }
 
 export function ProviderList({ providers }: { providers: ProviderScore[] }) {
@@ -56,7 +48,7 @@ export function ProviderList({ providers }: { providers: ProviderScore[] }) {
 										{p.error}
 									</span>
 								) : (
-									<>Updated {formatTime(p.timestamp)}</>
+									<Timestamp iso={p.timestamp} size="xs" />
 								)}
 							</p>
 						</div>
