@@ -3,13 +3,13 @@ import { sentimentLabel } from "../../utils/sentiment";
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
-function randomScore(): number {
-	return Math.floor(Math.random() * 100);
-}
-
 function timestamp(minutesAgo = 0): string {
 	const d = new Date(Date.now() - minutesAgo * 60_000);
 	return d.toISOString();
+}
+
+function randomScore(): number {
+	return Math.floor(Math.random() * 100);
 }
 
 export const alternativeMe = async (): Promise<ProviderScore> => {
@@ -80,9 +80,81 @@ export const socialSentiment = async (): Promise<ProviderScore> => {
 	};
 };
 
+export const coinGecko = async (): Promise<ProviderScore> => {
+	await sleep(200 + Math.random() * 350);
+	if (Math.random() < 0.06) throw new Error("CoinGecko API error");
+	const score = Math.max(0, Math.min(100, randomScore() + 8));
+	return {
+		provider: "CoinGecko Sentiment",
+		score,
+		label: sentimentLabel(score),
+		timestamp: timestamp(Math.floor(Math.random() * 120)),
+		confidence: 0.75 + Math.random() * 0.2,
+		source: "https://www.coingecko.com/",
+		metadata: { source: "coingecko", market: "crypto" },
+	};
+};
+
+export const tradingView = async (): Promise<ProviderScore> => {
+	await sleep(250 + Math.random() * 400);
+	const score = Math.max(0, Math.min(100, randomScore() + 20));
+	return {
+		provider: "TradingView Crypto",
+		score,
+		label: sentimentLabel(score),
+		timestamp: timestamp(Math.floor(Math.random() * 30)),
+		confidence: 0.7 + Math.random() * 0.2,
+		source: "https://www.tradingview.com/symbols/CRYPTOCAP-TOTAL/",
+		metadata: { source: "tradingview", market: "crypto" },
+	};
+};
+
+export const bitcoinDominance = async (): Promise<ProviderScore> => {
+	await sleep(180 + Math.random() * 300);
+	if (Math.random() < 0.04) {
+		return {
+			provider: "BTC Dominance",
+			score: 0,
+			label: "Extreme Fear",
+			timestamp: timestamp(4320),
+			error: "Stale dominance data",
+			confidence: 0,
+			metadata: { source: "btc_dominance", market: "crypto" },
+		};
+	}
+	const score = Math.max(0, Math.min(100, randomScore() - 5));
+	return {
+		provider: "BTC Dominance",
+		score,
+		label: sentimentLabel(score),
+		timestamp: timestamp(Math.floor(Math.random() * 4320)),
+		confidence: 0.8 + Math.random() * 0.15,
+		source: "https://www.coingecko.com/",
+		metadata: { source: "btc_dominance", market: "crypto" },
+	};
+};
+
+export const fearGreedCrypto = async (): Promise<ProviderScore> => {
+	await sleep(300 + Math.random() * 500);
+	const score = Math.max(0, Math.min(100, randomScore() + 10));
+	return {
+		provider: "Crypto Fear & Greed",
+		score,
+		label: sentimentLabel(score),
+		timestamp: timestamp(Math.floor(Math.random() * 1440)),
+		confidence: 0.85 + Math.random() * 0.1,
+		source: "https://alternative.me/crypto/fear-and-greed-index/",
+		metadata: { source: "crypto_fear_greed", market: "crypto" },
+	};
+};
+
 export const cryptoProviders = [
 	alternativeMe,
 	coinMarketCapPlaceholder,
 	cryptoProviderB,
 	socialSentiment,
+	coinGecko,
+	tradingView,
+	bitcoinDominance,
+	fearGreedCrypto,
 ];

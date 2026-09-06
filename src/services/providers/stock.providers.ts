@@ -3,13 +3,13 @@ import { sentimentLabel } from "../../utils/sentiment";
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
-function randomScore(): number {
-	return Math.floor(Math.random() * 100);
-}
-
 function timestamp(minutesAgo = 0): string {
 	const d = new Date(Date.now() - minutesAgo * 60_000);
 	return d.toISOString();
+}
+
+function randomScore(): number {
+	return Math.floor(Math.random() * 100);
 }
 
 export const cnnFearGreed = async (): Promise<ProviderScore> => {
@@ -81,9 +81,81 @@ export const putCall = async (): Promise<ProviderScore> => {
 	};
 };
 
+export const nyseTrin = async (): Promise<ProviderScore> => {
+	await sleep(180 + Math.random() * 320);
+	if (Math.random() < 0.07) throw new Error("NYSE TRIN data timeout");
+	const score = Math.max(0, Math.min(100, randomScore() - 8));
+	return {
+		provider: "NYSE TRIN",
+		score,
+		label: sentimentLabel(score),
+		timestamp: timestamp(Math.floor(Math.random() * 1440)),
+		confidence: 0.7 + Math.random() * 0.2,
+		source: "https://www.nyse.com/data/trin",
+		metadata: { source: "nyse_trin", market: "stock" },
+	};
+};
+
+export const sp500PutCall = async (): Promise<ProviderScore> => {
+	await sleep(220 + Math.random() * 400);
+	const score = Math.max(0, Math.min(100, randomScore() + 12));
+	return {
+		provider: "S&P 500 Put/Call",
+		score,
+		label: sentimentLabel(score),
+		timestamp: timestamp(Math.floor(Math.random() * 4320)),
+		confidence: 0.75 + Math.random() * 0.15,
+		source: "https://www.cboe.com/us/options/market_statistics/daily/",
+		metadata: { source: "sp500_put_call", market: "stock" },
+	};
+};
+
+export const investorSentiment = async (): Promise<ProviderScore> => {
+	await sleep(280 + Math.random() * 450);
+	if (Math.random() < 0.05) {
+		return {
+			provider: "AAII Investor Sentiment",
+			score: 0,
+			label: "Extreme Fear",
+			timestamp: timestamp(10080),
+			error: "Weekly survey pending",
+			confidence: 0,
+			metadata: { source: "aaii_sentiment", market: "stock" },
+		};
+	}
+	const score = Math.max(0, Math.min(100, randomScore() + 5));
+	return {
+		provider: "AAII Investor Sentiment",
+		score,
+		label: sentimentLabel(score),
+		timestamp: timestamp(Math.floor(Math.random() * 10080)),
+		confidence: 0.8 + Math.random() * 0.15,
+		source: "https://www.aaii.com/sentimentsurvey",
+		metadata: { source: "aaii_sentiment", market: "stock" },
+	};
+};
+
+export const marketBreadth = async (): Promise<ProviderScore> => {
+	await sleep(160 + Math.random() * 280);
+	const score = Math.max(0, Math.min(100, randomScore() + 18));
+	return {
+		provider: "Market Breadth Index",
+		score,
+		label: sentimentLabel(score),
+		timestamp: timestamp(Math.floor(Math.random() * 60)),
+		confidence: 0.65 + Math.random() * 0.2,
+		source: "https://www.nyse.com/market-statistics",
+		metadata: { source: "market_breadth", market: "stock" },
+	};
+};
+
 export const stockProviders = [
 	cnnFearGreed,
 	marketVane,
 	stockProviderB,
 	putCall,
+	nyseTrin,
+	sp500PutCall,
+	investorSentiment,
+	marketBreadth,
 ];
