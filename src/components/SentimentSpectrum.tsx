@@ -1,6 +1,6 @@
 import type React from "react";
 import type { ProviderScore } from "../types";
-import { isStale, formatTimestamp } from "../utils/time";
+import { isStale } from "../utils/time";
 import { Timestamp } from "./Timestamp";
 
 export function getSentimentColor(
@@ -175,7 +175,7 @@ export function ProviderRow({
 								{provider.error}
 							</span>
 						) : (
-							formatTimestamp(provider.timestamp).text
+							<Timestamp iso={provider.timestamp} size="xs" />
 						)}
 					</p>
 				</div>
