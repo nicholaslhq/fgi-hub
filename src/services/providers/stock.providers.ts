@@ -161,6 +161,32 @@ export const marketBreadth = async (): Promise<ProviderScore> => {
 	};
 };
 
+export const stockBullish = async (): Promise<ProviderScore> => {
+	await sleep(150 + Math.random() * 250);
+	return {
+		provider: "Stock Bullish Sentinel",
+		score: 100,
+		label: "Extreme Greed",
+		timestamp: timestamp(Math.floor(Math.random() * 5)),
+		confidence: 0.9 + Math.random() * 0.1,
+		source: "https://example.com/stock-bullish",
+		metadata: { source: "stock_bullish", market: "stock", fixedScore: true },
+	};
+};
+
+export const stockBearish = async (): Promise<ProviderScore> => {
+	await sleep(150 + Math.random() * 250);
+	return {
+		provider: "Stock Bearish Sentinel",
+		score: 0,
+		label: "Extreme Fear",
+		timestamp: timestamp(Math.floor(Math.random() * 5)),
+		confidence: 0.9 + Math.random() * 0.1,
+		source: "https://example.com/stock-bearish",
+		metadata: { source: "stock_bearish", market: "stock", fixedScore: true },
+	};
+};
+
 export const stockErrorProvider = async (): Promise<ProviderScore> => {
 	await sleep(100 + Math.random() * 200);
 	return providerError(
@@ -180,5 +206,7 @@ export const stockProviders = [
 	sp500PutCall,
 	investorSentiment,
 	marketBreadth,
+	stockBullish,
+	stockBearish,
 	stockErrorProvider,
 ];

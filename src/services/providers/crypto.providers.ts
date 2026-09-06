@@ -160,6 +160,32 @@ export const fearGreedCrypto = async (): Promise<ProviderScore> => {
 	};
 };
 
+export const cryptoBullish = async (): Promise<ProviderScore> => {
+	await sleep(150 + Math.random() * 250);
+	return {
+		provider: "Crypto Bullish Sentinel",
+		score: 100,
+		label: "Extreme Greed",
+		timestamp: timestamp(Math.floor(Math.random() * 5)),
+		confidence: 0.9 + Math.random() * 0.1,
+		source: "https://example.com/crypto-bullish",
+		metadata: { source: "crypto_bullish", market: "crypto", fixedScore: true },
+	};
+};
+
+export const cryptoBearish = async (): Promise<ProviderScore> => {
+	await sleep(150 + Math.random() * 250);
+	return {
+		provider: "Crypto Bearish Sentinel",
+		score: 0,
+		label: "Extreme Fear",
+		timestamp: timestamp(Math.floor(Math.random() * 5)),
+		confidence: 0.9 + Math.random() * 0.1,
+		source: "https://example.com/crypto-bearish",
+		metadata: { source: "crypto_bearish", market: "crypto", fixedScore: true },
+	};
+};
+
 export const cryptoErrorProvider = async (): Promise<ProviderScore> => {
 	await sleep(100 + Math.random() * 200);
 	return providerError(
@@ -179,5 +205,7 @@ export const cryptoProviders = [
 	tradingView,
 	bitcoinDominance,
 	fearGreedCrypto,
+	cryptoBullish,
+	cryptoBearish,
 	cryptoErrorProvider,
 ];
