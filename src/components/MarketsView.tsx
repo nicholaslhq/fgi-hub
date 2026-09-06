@@ -302,8 +302,15 @@ function Insights({ data }: { data: ConsensusResult }) {
 		);
 	}
 	if (data.details && data.details.maxAgeMinutes > 7) {
+		const totalMinutes = Math.round(data.details.maxAgeMinutes);
+		const hours = Math.floor(totalMinutes / 60);
+		const minutes = totalMinutes % 60;
+		const duration =
+			hours > 0
+				? `${hours} hour${hours !== 1 ? "s" : ""} ${minutes} minute${minutes !== 1 ? "s" : ""}`
+				: `${minutes} minute${minutes !== 1 ? "s" : ""}`;
 		insights.push(
-			`Data age gap: newest provider ${data.details.maxAgeMinutes} min behind freshness window`,
+			`Data age gap: newest provider ${duration} behind freshness window`,
 		);
 	}
 
