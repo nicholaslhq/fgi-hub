@@ -24,7 +24,7 @@ export function ProviderList({ providers }: { providers: ProviderScore[] }) {
 					>
 						<div className="flex items-center gap-3">
 							<span
-								className={`w-2.5 h-2.5 rounded-full ${sentimentDot(p.score, p.error)}`}
+								className={`w-1.5 h-1.5 rounded-full ${sentimentDot(p.score, p.error)}`}
 							/>
 						<div>
 							{p.source ? (

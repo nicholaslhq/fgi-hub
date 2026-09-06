@@ -184,7 +184,7 @@ function ProviderInsightRow({
 		>
 			<div className="flex items-center gap-3">
 				<div
-					className="w-2.5 h-2.5 rounded-full"
+					className="w-1.5 h-1.5 rounded-full"
 					style={{ background: statusColor }}
 				/>
 				<div>
@@ -543,23 +543,23 @@ export function MarketSection({
 								className="flex items-center gap-4 text-xs"
 								style={{ color: "var(--color-text-tertiary)" }}
 							>
-								<span className="flex items-center gap-1.5">
+								<span className="flex items-center gap-3">
 									<span
-										className="w-2 h-2 rounded-full"
+										className="w-1.5 h-1.5 rounded-full"
 										style={{ background: "var(--color-greed)" }}
 									/>
 									Active
 								</span>
-								<span className="flex items-center gap-1.5">
+								<span className="flex items-center gap-3">
 									<span
-										className="w-2 h-2 rounded-full"
+										className="w-1.5 h-1.5 rounded-full"
 										style={{ background: "var(--color-neutral)" }}
 									/>
 									Stale
 								</span>
-								<span className="flex items-center gap-1.5">
+								<span className="flex items-center gap-3">
 									<span
-										className="w-2 h-2 rounded-full"
+										className="w-1.5 h-1.5 rounded-full"
 										style={{ background: "var(--color-fear)" }}
 									/>
 									Error

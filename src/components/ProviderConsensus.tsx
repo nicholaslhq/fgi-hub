@@ -81,7 +81,7 @@ export function ProviderConsensus({
 			</div>
 
 			<div className="flex flex-wrap items-center gap-4 sm:gap-6 mb-4 text-xs">
-				<div className="flex items-center gap-2">
+				<div className="flex items-center gap-3">
 					<span style={{ color: "var(--color-text-tertiary)" }}>
 						Strategy:
 					</span>
@@ -92,7 +92,7 @@ export function ProviderConsensus({
 						{formatStrategyName(data.strategy)}
 					</span>
 				</div>
-				<div className="flex items-center gap-2">
+				<div className="flex items-center gap-3">
 					<span style={{ color: "var(--color-text-tertiary)" }}>
 						Confidence:
 					</span>
@@ -104,7 +104,7 @@ export function ProviderConsensus({
 					</span>
 				</div>
 				{data.ciLower !== undefined && data.ciUpper !== undefined && (
-					<div className="flex items-center gap-2">
+					<div className="flex items-center gap-3">
 						<span style={{ color: "var(--color-text-tertiary)" }}>
 							95% CI:
 						</span>
@@ -131,7 +131,7 @@ export function ProviderConsensus({
 				className="flex flex-wrap items-center gap-4 sm:gap-6 mt-6 pt-5"
 				style={{ borderTop: "1px solid var(--color-border-subtle)" }}
 			>
-				<div className="flex items-center gap-2">
+				<div className="flex items-center gap-3">
 					<div className="status-dot healthy" />
 					<span
 						className="text-xs font-medium"
@@ -141,7 +141,7 @@ export function ProviderConsensus({
 					</span>
 				</div>
 				{staleCount > 0 && (
-					<div className="flex items-center gap-2">
+					<div className="flex items-center gap-3">
 						<div className="status-dot stale" />
 						<span
 							className="text-xs font-medium"
@@ -152,7 +152,7 @@ export function ProviderConsensus({
 					</div>
 				)}
 				{errorCount > 0 && (
-					<div className="flex items-center gap-2">
+					<div className="flex items-center gap-3">
 						<div className="status-dot error" />
 						<span
 							className="text-xs font-medium"

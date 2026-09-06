@@ -48,9 +48,9 @@ export function SystemStatus({
 	return (
 		<div className="flex flex-col items-center sm:flex-row sm:items-center sm:justify-between gap-4 py-2 px-1">
 			<div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6 w-full sm:w-auto">
-				<div className="flex items-center gap-2">
+				<div className="flex items-center gap-3">
 					<div
-						className="w-2 h-2 rounded-full"
+						className="w-1.5 h-1.5 rounded-full"
 						style={{
 							backgroundColor: statusDotColor,
 							animation: isRefreshing

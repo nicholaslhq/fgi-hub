@@ -43,7 +43,7 @@ describe("countProviders", () => {
 	it("counts stale providers correctly", () => {
 		const providers = [
 			makeProvider(50),
-			makeProvider(60, { ageMinutes: 20 }),
+			makeProvider(60, { ageMinutes: 90 }),
 			makeProvider(70),
 		];
 		const result = countProviders(providers);
@@ -78,8 +78,8 @@ describe("countProviders", () => {
 
 	it("handles all providers stale", () => {
 		const providers = [
-			makeProvider(50, { ageMinutes: 30 }),
-			makeProvider(60, { ageMinutes: 60 }),
+			makeProvider(50, { ageMinutes: 90 }),
+			makeProvider(60, { ageMinutes: 120 }),
 		];
 		const result = countProviders(providers);
 		expect(result).toEqual({ total: 2, active: 0, stale: 2, failed: 0 });
@@ -89,9 +89,9 @@ describe("countProviders", () => {
 		const providers = [
 			makeProvider(50),
 			makeProvider(60, { error: "timeout" }),
-			makeProvider(70, { ageMinutes: 30 }),
+			makeProvider(70, { ageMinutes: 90 }),
 			makeProvider(80),
-			makeProvider(90, { error: "api_error", ageMinutes: 30 }),
+			makeProvider(90, { error: "api_error", ageMinutes: 90 }),
 		];
 		const result = countProviders(providers);
 		expect(result).toEqual({ total: 5, active: 2, stale: 1, failed: 2 });
@@ -101,9 +101,9 @@ describe("countProviders", () => {
 		const providers = [
 			makeProvider(50),
 			makeProvider(60, { error: "timeout" }),
-			makeProvider(70, { ageMinutes: 30 }),
+			makeProvider(70, { ageMinutes: 90 }),
 			makeProvider(80),
-			makeProvider(90, { error: "api_error", ageMinutes: 30 }),
+			makeProvider(90, { error: "api_error", ageMinutes: 90 }),
 		];
 		const result = countProviders(providers);
 		expect(result.active + result.stale + result.failed).toBe(result.total);

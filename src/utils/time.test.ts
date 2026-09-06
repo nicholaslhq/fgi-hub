@@ -46,8 +46,8 @@ describe("isStale", () => {
 });
 
 describe("STALE_THRESHOLD_MS", () => {
-	it("equals 15 minutes in milliseconds", () => {
-		expect(STALE_THRESHOLD_MS).toBe(15 * 60_000);
+	it("equals 60 minutes in milliseconds", () => {
+		expect(STALE_THRESHOLD_MS).toBe(60 * 60_000);
 	});
 });
 
@@ -58,9 +58,9 @@ describe("getTimestampTier", () => {
 		expect(getTimestampTier(recent, now)).toBe("fresh");
 	});
 
-	it("returns stale for timestamps older than 15 minutes but less than 24 hours", () => {
+	it("returns stale for timestamps older than 60 minutes but less than 24 hours", () => {
 		const now = Date.now();
-		const staleTs = new Date(now - 30 * 60_000).toISOString();
+		const staleTs = new Date(now - 90 * 60_000).toISOString();
 		expect(getTimestampTier(staleTs, now)).toBe("stale");
 	});
 
@@ -70,7 +70,7 @@ describe("getTimestampTier", () => {
 		expect(getTimestampTier(oldTs, now)).toBe("outdated");
 	});
 
-	it("returns fresh for a timestamp just under 15 minutes old", () => {
+	it("returns fresh for a timestamp just under 60 minutes old", () => {
 		const now = Date.now();
 		const justFresh = new Date(now - STALE_THRESHOLD_MS + 1_000).toISOString();
 		expect(getTimestampTier(justFresh, now)).toBe("fresh");
@@ -87,11 +87,11 @@ describe("formatTimestamp", () => {
 		expect(result.tier).toBe("fresh");
 	});
 
-	it("returns relative minutes for timestamps 15-59 minutes old", () => {
+	it("returns relative minutes for timestamps 1-59 minutes old", () => {
 		const ts = new Date(FIXED_NOW - 30 * 60_000).toISOString();
 		const result = formatTimestamp(ts, FIXED_NOW);
 		expect(result.text).toBe("Updated 30m ago");
-		expect(result.tier).toBe("stale");
+		expect(result.tier).toBe("fresh");
 	});
 
 	it("returns time-only format for same-day timestamps older than an hour", () => {

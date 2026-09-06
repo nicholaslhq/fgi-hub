@@ -144,7 +144,7 @@ export function ProviderRow({
 
 	return (
 		<div className="provider-row">
-			<div className="flex items-center gap-3 sm:gap-4 flex-1 min-w-0">
+			<div className="flex items-center gap-3 flex-1 min-w-0">
 				<div
 					className={`status-dot ${status}`}
 					title={provider.error || (stale ? "Stale" : "Healthy")}

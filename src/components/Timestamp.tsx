@@ -29,7 +29,7 @@ export function Timestamp({
 
 	return (
 		<span
-			className={`inline-flex items-center gap-1 ${sizeClasses[size]}`}
+			className={`inline-flex items-center gap-3 ${sizeClasses[size]}`}
 			style={{ color }}
 			title={tooltip}
 		>
