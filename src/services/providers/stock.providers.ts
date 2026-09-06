@@ -149,6 +149,19 @@ export const marketBreadth = async (): Promise<ProviderScore> => {
 	};
 };
 
+export const stockErrorProvider = async (): Promise<ProviderScore> => {
+	await sleep(100 + Math.random() * 200);
+	return {
+		provider: "Stock Error Provider",
+		score: 0,
+		label: "Extreme Fear",
+		timestamp: timestamp(Math.floor(Math.random() * 10)),
+		error: "Permanently unavailable",
+		confidence: 0,
+		metadata: { source: "stock_error_provider", market: "stock" },
+	};
+};
+
 export const stockProviders = [
 	cnnFearGreed,
 	marketVane,
@@ -158,4 +171,5 @@ export const stockProviders = [
 	sp500PutCall,
 	investorSentiment,
 	marketBreadth,
+	stockErrorProvider,
 ];

@@ -148,6 +148,19 @@ export const fearGreedCrypto = async (): Promise<ProviderScore> => {
 	};
 };
 
+export const cryptoErrorProvider = async (): Promise<ProviderScore> => {
+	await sleep(100 + Math.random() * 200);
+	return {
+		provider: "Crypto Error Provider",
+		score: 0,
+		label: "Extreme Fear",
+		timestamp: timestamp(Math.floor(Math.random() * 10)),
+		error: "Permanently unavailable",
+		confidence: 0,
+		metadata: { source: "crypto_error_provider", market: "crypto" },
+	};
+};
+
 export const cryptoProviders = [
 	alternativeMe,
 	coinMarketCapPlaceholder,
@@ -157,4 +170,5 @@ export const cryptoProviders = [
 	tradingView,
 	bitcoinDominance,
 	fearGreedCrypto,
+	cryptoErrorProvider,
 ];
