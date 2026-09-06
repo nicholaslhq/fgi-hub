@@ -1,5 +1,6 @@
 import type { ProviderScore, Market } from "../../types/index.js";
 import { sentimentLabel } from "../../utils/sentiment.js";
+import { providerError } from "../../utils/errors.js";
 
 const TIMEOUT_MS = 10000;
 
@@ -61,7 +62,12 @@ export async function fetchCnnFearGreed(): Promise<ProviderScore> {
 
 	const current = data.fear_and_greed;
 	if (!current || current.score === undefined) {
-		throw new Error("CNN: missing fear_and_greed data");
+		return providerError(
+			"CNN Fear & Greed",
+			"CNN: missing fear_and_greed data",
+			"stock",
+			"https://www.cnn.com/markets/fear-and-greed",
+		);
 	}
 
 	const score = Math.round(current.score);
@@ -95,7 +101,12 @@ export async function fetchFearGreedChartStock(): Promise<ProviderScore> {
 	};
 
 	if (!data.score || data.score.score === undefined) {
-		throw new Error("FearGreedChart: missing score data");
+		return providerError(
+			"FearGreedChart (Stock)",
+			"FearGreedChart: missing score data",
+			"stock",
+			"https://feargreedchart.com/",
+		);
 	}
 
 	const score = Math.round(data.score.score);
@@ -125,18 +136,33 @@ export async function fetchCboePutCallRatio(): Promise<ProviderScore> {
 
 	const idx = html.indexOf("EQUITY OPTIONS");
 	if (idx < 0) {
-		throw new Error("CBOE: could not find EQUITY OPTIONS in page");
+		return providerError(
+			"CBOE Put/Call Ratio",
+			"CBOE: could not find EQUITY OPTIONS in page",
+			"stock",
+			"https://www.cboe.com/us/options/market_statistics/daily/",
+		);
 	}
 
 	const slice = html.substring(idx);
 	const arrStart = slice.indexOf("[");
 	if (arrStart < 0) {
-		throw new Error("CBOE: could not find array start");
+		return providerError(
+			"CBOE Put/Call Ratio",
+			"CBOE: could not find array start",
+			"stock",
+			"https://www.cboe.com/us/options/market_statistics/daily/",
+		);
 	}
 
 	const arrEnd = slice.indexOf("]", arrStart);
 	if (arrEnd < 0) {
-		throw new Error("CBOE: could not find array end");
+		return providerError(
+			"CBOE Put/Call Ratio",
+			"CBOE: could not find array end",
+			"stock",
+			"https://www.cboe.com/us/options/market_statistics/daily/",
+		);
 	}
 
 	const jsonStr = slice.substring(arrStart, arrEnd + 1).replace(/\\"/g, '"');
@@ -149,7 +175,12 @@ export async function fetchCboePutCallRatio(): Promise<ProviderScore> {
 
 	const volume = arr.find((entry) => entry.name === "VOLUME");
 	if (!volume || !volume.call || volume.call === 0) {
-		throw new Error("CBOE: could not find valid VOLUME entry");
+		return providerError(
+			"CBOE Put/Call Ratio",
+			"CBOE: could not find valid VOLUME entry",
+			"stock",
+			"https://www.cboe.com/us/options/market_statistics/daily/",
+		);
 	}
 
 	const callVol = volume.call;
@@ -212,7 +243,12 @@ export async function fetchFearGreedMeterStock(): Promise<ProviderScore> {
 	const fgi = data?.props?.pageProps?.data?.fgi;
 	const now = fgi?.latest?.now;
 	if (typeof now !== "number") {
-		throw new Error("FearGreedMeter Stock: missing fgi.latest.now");
+		return providerError(
+			"FearGreedMeter (Stock)",
+			"FearGreedMeter Stock: missing fgi.latest.now",
+			"stock",
+			"https://feargreedmeter.com/",
+		);
 	}
 
 	const score = Math.round(now);
@@ -244,7 +280,12 @@ export async function fetchCfgiStock(): Promise<ProviderScore> {
 	const metaMatch = html.match(/<p class="meta">([^<]+)<\/p>/);
 
 	if (!valueMatch) {
-		throw new Error("CFGI Stock: could not find value span");
+		return providerError(
+			"CFGI (Stock)",
+			"CFGI Stock: could not find value span",
+			"stock",
+			"https://cfgi.io/",
+		);
 	}
 
 	const score = parseInt(valueMatch[1], 10);

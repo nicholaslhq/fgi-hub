@@ -1,5 +1,6 @@
 import type { ProviderScore } from "../../types/index";
 import { sentimentLabel } from "../../utils/sentiment";
+import { providerError } from "../../utils/errors";
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
@@ -14,7 +15,13 @@ function randomScore(): number {
 
 export const alternativeMe = async (): Promise<ProviderScore> => {
 	await sleep(250 + Math.random() * 400);
-	if (Math.random() < 0.06) throw new Error("Alternative.me API error");
+	if (Math.random() < 0.06)
+		return providerError(
+			"Alternative.me",
+			"Alternative.me API error",
+			"crypto",
+			"https://alternative.me/crypto/fear-and-greed-index/",
+		);
 	const score = Math.max(0, Math.min(100, randomScore() - 10));
 	return {
 		provider: "Alternative.me",
@@ -30,7 +37,12 @@ export const alternativeMe = async (): Promise<ProviderScore> => {
 export const coinMarketCapPlaceholder = async (): Promise<ProviderScore> => {
 	await sleep(400 + Math.random() * 600);
 	if (Math.random() < 0.1)
-		throw new Error("CoinMarketCap placeholder unavailable");
+		return providerError(
+			"CoinMarketCap",
+			"CoinMarketCap placeholder unavailable",
+			"crypto",
+			"https://coinmarketcap.com/charts/fear-and-greed-index/",
+		);
 	const score = Math.max(0, Math.min(100, randomScore() + 5));
 	return {
 		provider: "CoinMarketCap",
@@ -46,15 +58,12 @@ export const coinMarketCapPlaceholder = async (): Promise<ProviderScore> => {
 export const cryptoProviderB = async (): Promise<ProviderScore> => {
 	await sleep(200 + Math.random() * 300);
 	if (Math.random() < 0.04) {
-		return {
-			provider: "Crypto Provider B",
-			score: 0,
-			label: "Extreme Fear",
-			timestamp: timestamp(60),
-			error: "Partial response",
-			confidence: 0,
-			metadata: { source: "crypto_provider_b", market: "crypto" },
-		};
+		return providerError(
+			"Crypto Provider B",
+			"Partial response",
+			"crypto",
+			"unknown",
+		);
 	}
 	const score = Math.max(0, Math.min(100, randomScore() + 15));
 	return {
@@ -82,7 +91,13 @@ export const socialSentiment = async (): Promise<ProviderScore> => {
 
 export const coinGecko = async (): Promise<ProviderScore> => {
 	await sleep(200 + Math.random() * 350);
-	if (Math.random() < 0.06) throw new Error("CoinGecko API error");
+	if (Math.random() < 0.06)
+		return providerError(
+			"CoinGecko Sentiment",
+			"CoinGecko API error",
+			"crypto",
+			"https://www.coingecko.com/",
+		);
 	const score = Math.max(0, Math.min(100, randomScore() + 8));
 	return {
 		provider: "CoinGecko Sentiment",
@@ -112,15 +127,12 @@ export const tradingView = async (): Promise<ProviderScore> => {
 export const bitcoinDominance = async (): Promise<ProviderScore> => {
 	await sleep(180 + Math.random() * 300);
 	if (Math.random() < 0.04) {
-		return {
-			provider: "BTC Dominance",
-			score: 0,
-			label: "Extreme Fear",
-			timestamp: timestamp(4320),
-			error: "Stale dominance data",
-			confidence: 0,
-			metadata: { source: "btc_dominance", market: "crypto" },
-		};
+		return providerError(
+			"BTC Dominance",
+			"Stale dominance data",
+			"crypto",
+			"https://www.coingecko.com/",
+		);
 	}
 	const score = Math.max(0, Math.min(100, randomScore() - 5));
 	return {
@@ -150,15 +162,12 @@ export const fearGreedCrypto = async (): Promise<ProviderScore> => {
 
 export const cryptoErrorProvider = async (): Promise<ProviderScore> => {
 	await sleep(100 + Math.random() * 200);
-	return {
-		provider: "Crypto Error Provider",
-		score: 0,
-		label: "Extreme Fear",
-		timestamp: timestamp(Math.floor(Math.random() * 10)),
-		error: "Permanently unavailable",
-		confidence: 0,
-		metadata: { source: "crypto_error_provider", market: "crypto" },
-	};
+	return providerError(
+		"Crypto Error Provider",
+		"Permanently unavailable",
+		"crypto",
+		"crypto_error_provider",
+	);
 };
 
 export const cryptoProviders = [

@@ -20,7 +20,6 @@ export type DataFreshness = "realtime" | "delayed" | "stale" | "expired";
 export interface ProviderScore {
 	provider: string;
 	score: number;
-	label: SentimentLabel;
 	timestamp: string;
 	confidence?: number;
 	metadata?: Record<string, unknown>;
@@ -30,6 +29,7 @@ export interface ProviderScore {
 	method?: AcquisitionMethod;
 	retrievedAt?: string;
 	freshness?: DataFreshness;
+	label?: SentimentLabel;
 }
 
 export type AggregationStrategy =

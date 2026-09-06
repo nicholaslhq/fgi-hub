@@ -1,5 +1,6 @@
 import type { ProviderScore } from "../../types/index";
 import { sentimentLabel } from "../../utils/sentiment";
+import { providerError } from "../../utils/errors";
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
@@ -14,7 +15,13 @@ function randomScore(): number {
 
 export const cnnFearGreed = async (): Promise<ProviderScore> => {
 	await sleep(300 + Math.random() * 500);
-	if (Math.random() < 0.05) throw new Error("CNN Fear & Greed API timeout");
+	if (Math.random() < 0.05)
+		return providerError(
+			"CNN Fear & Greed",
+			"CNN Fear & Greed API timeout",
+			"stock",
+			"https://www.cnn.com/markets/fear-and-greed",
+		);
 	const score = Math.max(0, Math.min(100, randomScore() + 10));
 	return {
 		provider: "CNN Fear & Greed",
@@ -30,7 +37,12 @@ export const cnnFearGreed = async (): Promise<ProviderScore> => {
 export const marketVane = async (): Promise<ProviderScore> => {
 	await sleep(200 + Math.random() * 400);
 	if (Math.random() < 0.08)
-		throw new Error("Market Vane service unavailable");
+		return providerError(
+			"Market Vane",
+			"Market Vane service unavailable",
+			"stock",
+			"http://www.marketvane.net/",
+		);
 	const score = Math.max(0, Math.min(100, randomScore() - 5));
 	return {
 		provider: "Market Vane",
@@ -46,15 +58,12 @@ export const marketVane = async (): Promise<ProviderScore> => {
 export const stockProviderB = async (): Promise<ProviderScore> => {
 	await sleep(250 + Math.random() * 350);
 	if (Math.random() < 0.03) {
-		return {
-			provider: "Stock Provider B",
-			score: 0,
-			label: "Extreme Fear",
-			timestamp: timestamp(45),
-			error: "Stale data returned",
-			confidence: 0,
-			metadata: { source: "stock_provider_b", market: "stock" },
-		};
+		return providerError(
+			"Stock Provider B",
+			"Stale data returned",
+			"stock",
+			"unknown",
+		);
 	}
 	const score = Math.max(0, Math.min(100, randomScore() + 20));
 	return {
@@ -83,7 +92,13 @@ export const putCall = async (): Promise<ProviderScore> => {
 
 export const nyseTrin = async (): Promise<ProviderScore> => {
 	await sleep(180 + Math.random() * 320);
-	if (Math.random() < 0.07) throw new Error("NYSE TRIN data timeout");
+	if (Math.random() < 0.07)
+		return providerError(
+			"NYSE TRIN",
+			"NYSE TRIN data timeout",
+			"stock",
+			"https://www.nyse.com/data/trin",
+		);
 	const score = Math.max(0, Math.min(100, randomScore() - 8));
 	return {
 		provider: "NYSE TRIN",
@@ -113,15 +128,12 @@ export const sp500PutCall = async (): Promise<ProviderScore> => {
 export const investorSentiment = async (): Promise<ProviderScore> => {
 	await sleep(280 + Math.random() * 450);
 	if (Math.random() < 0.05) {
-		return {
-			provider: "AAII Investor Sentiment",
-			score: 0,
-			label: "Extreme Fear",
-			timestamp: timestamp(10080),
-			error: "Weekly survey pending",
-			confidence: 0,
-			metadata: { source: "aaii_sentiment", market: "stock" },
-		};
+		return providerError(
+			"AAII Investor Sentiment",
+			"Weekly survey pending",
+			"stock",
+			"https://www.aaii.com/sentimentsurvey",
+		);
 	}
 	const score = Math.max(0, Math.min(100, randomScore() + 5));
 	return {
@@ -151,15 +163,12 @@ export const marketBreadth = async (): Promise<ProviderScore> => {
 
 export const stockErrorProvider = async (): Promise<ProviderScore> => {
 	await sleep(100 + Math.random() * 200);
-	return {
-		provider: "Stock Error Provider",
-		score: 0,
-		label: "Extreme Fear",
-		timestamp: timestamp(Math.floor(Math.random() * 10)),
-		error: "Permanently unavailable",
-		confidence: 0,
-		metadata: { source: "stock_error_provider", market: "stock" },
-	};
+	return providerError(
+		"Stock Error Provider",
+		"Permanently unavailable",
+		"stock",
+		"stock_error_provider",
+	);
 };
 
 export const stockProviders = [

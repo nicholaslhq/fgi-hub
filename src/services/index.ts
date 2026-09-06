@@ -2,6 +2,7 @@ import type { ConsensusResult, ProviderScore } from "../types";
 import { aggregate } from "./aggregation";
 import { stockProviders } from "./providers/stock.providers";
 import { cryptoProviders } from "./providers/crypto.providers";
+import { providerError } from "../utils/errors";
 
 export interface RefreshOptions {
 	previousStockScore?: number;
@@ -17,16 +18,12 @@ async function fetchConsensus(
 	const results = await Promise.allSettled(providerFns.map((fn) => fn()));
 	const providers: ProviderScore[] = results.map((r, i) => {
 		if (r.status === "fulfilled") return r.value;
-		return {
-			provider: providerNames[i],
-			score: NaN,
-			label: "Extreme Fear",
-			timestamp: new Date().toISOString(),
-			error:
-				r.reason instanceof Error ? r.reason.message : "Unknown error",
-			confidence: 0,
-			metadata: { source: "unknown", market },
-		};
+		return providerError(
+			providerNames[i],
+			r.reason instanceof Error ? r.reason.message : "Unknown error",
+			market,
+			"unknown",
+		);
 	});
 	const consensus = aggregate(market, providers, previousScore);
 	if (!consensus) throw new Error(`Unable to calculate ${market} consensus`);

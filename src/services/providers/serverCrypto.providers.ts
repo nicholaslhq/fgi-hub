@@ -1,5 +1,6 @@
 import type { ProviderScore, Market } from "../../types/index.js";
 import { sentimentLabel } from "../../utils/sentiment.js";
+import { providerError } from "../../utils/errors.js";
 
 const TIMEOUT_MS = 10000;
 
@@ -37,12 +38,22 @@ export async function fetchAlternativeMe(): Promise<ProviderScore> {
 	};
 
 	if (!data.data || data.data.length === 0) {
-		throw new Error("Alternative.me: no data returned");
+		return providerError(
+			"Alternative.me",
+			"Alternative.me: no data returned",
+			"crypto",
+			"https://alternative.me/crypto/fear-and-greed-index/",
+		);
 	}
 
 	const entry = data.data[0];
 	if (entry.value === undefined) {
-		throw new Error("Alternative.me: missing value");
+		return providerError(
+			"Alternative.me",
+			"Alternative.me: missing value",
+			"crypto",
+			"https://alternative.me/crypto/fear-and-greed-index/",
+		);
 	}
 
 	const score = parseInt(entry.value, 10);
@@ -81,7 +92,12 @@ export async function fetchFearGreedChartCrypto(): Promise<ProviderScore> {
 	};
 
 	if (data.score === undefined) {
-		throw new Error("FearGreedChart Crypto: missing data");
+		return providerError(
+			"FearGreedChart (Crypto)",
+			"FearGreedChart Crypto: missing data",
+			"crypto",
+			"https://crypto.feargreedchart.com/",
+		);
 	}
 
 	const score = Math.round(data.score);
@@ -156,7 +172,12 @@ export async function fetchFearGreedMeterCrypto(): Promise<ProviderScore> {
 
 	const series = data?.props?.pageProps?.data?.fgi_crypto;
 	if (!Array.isArray(series) || series.length === 0) {
-		throw new Error("FearGreedMeter Crypto: missing fgi_crypto series");
+		return providerError(
+			"FearGreedMeter (Crypto)",
+			"FearGreedMeter Crypto: missing fgi_crypto series",
+			"crypto",
+			"https://feargreedmeter.com/crypto",
+		);
 	}
 
 	const entry = series[0];
@@ -168,7 +189,12 @@ export async function fetchFearGreedMeterCrypto(): Promise<ProviderScore> {
 				? parseInt(rawValue, 10)
 				: NaN;
 	if (!Number.isFinite(numericValue)) {
-		throw new Error("FearGreedMeter Crypto: missing value in latest entry");
+		return providerError(
+			"FearGreedMeter (Crypto)",
+			"FearGreedMeter Crypto: missing value in latest entry",
+			"crypto",
+			"https://feargreedmeter.com/crypto",
+		);
 	}
 
 	const score = Math.round(numericValue);
@@ -224,7 +250,12 @@ export async function fetchCfgiCrypto(): Promise<ProviderScore> {
 	const metaMatch = html.match(/<p class="meta">([^<]+)<\/p>/);
 
 	if (!valueMatch) {
-		throw new Error("CFGI Crypto: could not find value span");
+		return providerError(
+			"CFGI (Crypto)",
+			"CFGI Crypto: could not find value span",
+			"crypto",
+			"https://cfgi.io/",
+		);
 	}
 
 	const score = parseInt(valueMatch[1], 10);
@@ -282,12 +313,22 @@ export async function fetchCoinMarketCapFgi(): Promise<ProviderScore> {
 	const startMarker = '<script id="__NEXT_DATA__" type="application/json"';
 	const startIdx = html.indexOf(startMarker);
 	if (startIdx < 0) {
-		throw new Error("CoinMarketCap: __NEXT_DATA__ script not found");
+		return providerError(
+			"CoinMarketCap",
+			"CoinMarketCap: __NEXT_DATA__ script not found",
+			"crypto",
+			"https://coinmarketcap.com/charts/fear-and-greed-index/",
+		);
 	}
 	const jsonStart = html.indexOf(">", startIdx) + 1;
 	const endIdx = html.indexOf("</script>", jsonStart);
 	if (endIdx < 0) {
-		throw new Error("CoinMarketCap: __NEXT_DATA__ end tag not found");
+		return providerError(
+			"CoinMarketCap",
+			"CoinMarketCap: __NEXT_DATA__ end tag not found",
+			"crypto",
+			"https://coinmarketcap.com/charts/fear-and-greed-index/",
+		);
 	}
 
 	const data = JSON.parse(html.substring(jsonStart, endIdx)) as {
@@ -309,7 +350,12 @@ export async function fetchCoinMarketCapFgi(): Promise<ProviderScore> {
 	const current =
 		data?.props?.pageProps?.pageSharedData?.fearGreedIndexData?.currentIndex;
 	if (!current || typeof current.score !== "number") {
-		throw new Error("CoinMarketCap: missing fearGreedIndexData.currentIndex.score");
+		return providerError(
+			"CoinMarketCap",
+			"CoinMarketCap: missing fearGreedIndexData.currentIndex.score",
+			"crypto",
+			"https://coinmarketcap.com/charts/fear-and-greed-index/",
+		);
 	}
 
 	const score = Math.round(current.score);

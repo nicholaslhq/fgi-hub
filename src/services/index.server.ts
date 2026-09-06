@@ -8,6 +8,7 @@ import {
 	serverCryptoProviders,
 	cryptoProviderNames,
 } from "./providers/serverCrypto.providers.js";
+import { providerError } from "../utils/errors.js";
 
 const STOCK_PROVIDER_NAMES = stockProviderNames;
 const CRYPTO_PROVIDER_NAMES = cryptoProviderNames;
@@ -22,16 +23,12 @@ async function fetchConsensusProd(
 
 	const providers: ProviderScore[] = results.map((r, i) => {
 		if (r.status === "fulfilled") return r.value;
-		return {
-			provider: providerNames[i],
-			score: NaN,
-			label: "Extreme Fear" as const,
-			timestamp: new Date().toISOString(),
-			error:
-				r.reason instanceof Error ? r.reason.message : "Unknown error",
-			confidence: 0,
-			metadata: { source: "unknown", market },
-		};
+		return providerError(
+			providerNames[i],
+			r.reason instanceof Error ? r.reason.message : "Unknown error",
+			market,
+			"unknown",
+		);
 	});
 
 	const consensus = aggregate(market, providers, previousScore);
