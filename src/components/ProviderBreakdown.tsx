@@ -28,7 +28,7 @@ interface EnrichedProvider {
 	confidence?: number;
 	error?: string;
 	source?: string;
-	status: "healthy" | "stale" | "error";
+	status: "active" | "stale" | "error";
 	weight: number;
 	normalizedWeight: number;
 	deviation: number | null;
@@ -90,7 +90,7 @@ export function ProviderBreakdown({
 				confidence: p.confidence,
 				error: p.error,
 				source: p.source,
-				status: hasError ? "error" : stale ? "stale" : "healthy",
+				status: hasError ? "error" : stale ? "stale" : "active",
 				weight,
 				normalizedWeight: weight / maxWeight,
 				deviation,
@@ -143,7 +143,7 @@ export function ProviderBreakdown({
 		return arr;
 	}, [enriched, sortKey, sortDir]);
 
-	const healthyCount = enriched.filter((p) => p.status === "healthy").length;
+	const activeCount = enriched.filter((p) => p.status === "active").length;
 	const staleCount = enriched.filter((p) => p.status === "stale").length;
 	const errorCount = enriched.filter((p) => p.status === "error").length;
 	const outlierCount = enriched.filter((p) => p.isOutlier).length;
@@ -202,7 +202,7 @@ export function ProviderBreakdown({
 								·
 							</span>
 							<span style={{ color: "var(--color-greed)" }}>
-								{healthyCount} active
+								{activeCount} active
 							</span>
 							{staleCount > 0 && (
 								<>
@@ -321,7 +321,7 @@ export function ProviderBreakdown({
 													p.error ||
 													(p.status === "stale"
 														? "Stale"
-														: "Healthy")
+														: "Active")
 												}
 											/>
 											<div className="min-w-0">

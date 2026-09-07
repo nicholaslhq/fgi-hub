@@ -138,7 +138,7 @@ export function ProviderRow({
 			? "rgb(250, 204, 21)"
 			: "rgb(202, 138, 4)"
 		: getSentimentColor(provider.score, theme);
-	const status = hasError ? "error" : stale ? "stale" : "healthy";
+	const status = hasError ? "error" : stale ? "stale" : "active";
 
 	const titleClassName = "text-sm font-medium truncate provider-link";
 	const titleStyle = { color: "var(--color-text-primary)" };
@@ -148,7 +148,7 @@ export function ProviderRow({
 			<div className="flex items-center gap-3 flex-1 min-w-0">
 				<div
 					className={`status-dot ${status}`}
-					title={provider.error || (stale ? "Stale" : "Healthy")}
+					title={provider.error || (stale ? "Stale" : "Active")}
 				/>
 				<div className="min-w-0">
 					{provider.source ? (

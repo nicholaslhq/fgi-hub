@@ -395,7 +395,7 @@ body {
 	flex-shrink: 0;
 }
 
-.status-dot.healthy {
+.status-dot.active {
 	background: var(--color-greed);
 }
 

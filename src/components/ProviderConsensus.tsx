@@ -132,7 +132,7 @@ export function ProviderConsensus({
 				style={{ borderTop: "1px solid var(--color-border-subtle)" }}
 			>
 				<div className="flex items-center gap-3">
-					<div className="status-dot healthy" />
+					<div className="status-dot active" />
 					<span
 						className="text-xs font-medium"
 						style={{ color: "var(--color-text-tertiary)" }}
