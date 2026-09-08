@@ -360,11 +360,14 @@ export function ProviderBreakdown({
 															</svg>
 														</span>
 													</a>
-												) : (
-													<p className="provider-link-text">
-														{p.provider}
-													</p>
-												)}
+											) : (
+												<p
+													className="text-sm font-medium truncate provider-link"
+													style={{ color: "var(--color-text-primary)" }}
+												>
+													{p.provider}
+												</p>
+											)}
 												<div className="flex items-center gap-2 mt-0.5">
 													<p
 														className="text-xs"
