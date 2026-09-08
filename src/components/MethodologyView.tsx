@@ -251,7 +251,7 @@ export function MethodologyView() {
 
 			<Section title="Adaptive Robust Aggregation (ARA)">
 				<p>
-					The ARA framework operates in five sequential phases. At
+					The ARA framework operates in six sequential phases. At
 					each phase, the algorithm characterizes the current data
 					state and selects the most appropriate mathematical strategy
 					— all decisions are deterministic, data-driven, and
@@ -524,7 +524,7 @@ export function MethodologyView() {
 					ciScore = max(0, 1 − (ciUpper − ciLower)/100). quality =
 					sizeQuality×0.15 + dispersionQuality×0.35 +
 					outlierQuality×0.25 + effectiveNQuality×0.25. Each
-					component is clamped to [0, 1] before blending. A score of
+					component is bounded to [0, 1] before blending. A score of
 					0.90 means high certainty that the true consensus falls
 					within the reported range.
 				</p>
@@ -589,7 +589,7 @@ export function MethodologyView() {
 					<MetricDoc
 						name="95% Confidence Interval (CI)"
 						definition="A range [ciLower, ciUpper] within which the true market sentiment is expected to fall 95% of the time, assuming the current sample is representative."
-						calculation="margin = 1.96 × SE, where SE = robustSigma / √n for median/MAD strategies, or SE = weightedStdDev / √effectiveN for parametric strategies. robustSigma = MAD / 0.6745."
+						calculation="margin = 1.96 × SE, where SE = robustSigma / √n when MAD > 0 or strategy is median, else SE = weightedStdDev / √max(effectiveN, 1). robustSigma = MAD / 0.6745."
 						interpretation="Narrow intervals (width &lt; 10) indicate precise estimates. Wide intervals (width &gt; 20) signal high uncertainty. If the interval crosses the Neutral midpoint (50), the true sentiment could be either fearful or greedy."
 					/>
 					<MetricDoc
@@ -631,7 +631,7 @@ export function MethodologyView() {
 					<MetricDoc
 						name="Score Variance"
 						definition="The average squared deviation of active provider scores from their mean. Unlike std dev, variance is not normalized back to score units."
-						calculation="variance = Σ(scoreᵢ − mean)² / n"
+						calculation="variance = Σ(scoreᵢ − mean)² / n, where mean = Σ(scoreᵢ) / n is the unrounded simple average."
 						interpretation="Useful for comparing dispersion across markets or time periods without taking a square root. Lower variance = more homogeneous provider sentiment. High variance = heterogeneous views that may reflect genuine market uncertainty."
 					/>
 					<MetricDoc
