@@ -186,6 +186,20 @@ export const cryptoBearish = async (): Promise<ProviderScore> => {
 	};
 };
 
+export const cryptoStale = async (): Promise<ProviderScore> => {
+	await sleep(200 + Math.random() * 300);
+	const score = Math.max(0, Math.min(100, randomScore() + 5));
+	return {
+		provider: "Crypto Stale Archive",
+		score,
+		label: sentimentLabel(score),
+		timestamp: timestamp(Math.floor(Math.random() * 4320) + 4320),
+		confidence: 0.5 + Math.random() * 0.2,
+		source: "https://example.com/crypto-stale",
+		metadata: { source: "crypto_stale", market: "crypto", stale: true },
+	};
+};
+
 export const cryptoErrorProvider = async (): Promise<ProviderScore> => {
 	await sleep(100 + Math.random() * 200);
 	return providerError(
@@ -207,5 +221,6 @@ export const cryptoProviders = [
 	fearGreedCrypto,
 	cryptoBullish,
 	cryptoBearish,
+	cryptoStale,
 	cryptoErrorProvider,
 ];

@@ -187,6 +187,20 @@ export const stockBearish = async (): Promise<ProviderScore> => {
 	};
 };
 
+export const stockStale = async (): Promise<ProviderScore> => {
+	await sleep(200 + Math.random() * 300);
+	const score = Math.max(0, Math.min(100, randomScore() + 5));
+	return {
+		provider: "Stock Stale Archive",
+		score,
+		label: sentimentLabel(score),
+		timestamp: timestamp(Math.floor(Math.random() * 4320) + 4320),
+		confidence: 0.5 + Math.random() * 0.2,
+		source: "https://example.com/stock-stale",
+		metadata: { source: "stock_stale", market: "stock", stale: true },
+	};
+};
+
 export const stockErrorProvider = async (): Promise<ProviderScore> => {
 	await sleep(100 + Math.random() * 200);
 	return providerError(
@@ -208,5 +222,6 @@ export const stockProviders = [
 	marketBreadth,
 	stockBullish,
 	stockBearish,
+	stockStale,
 	stockErrorProvider,
 ];
