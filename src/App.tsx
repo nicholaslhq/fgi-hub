@@ -1,6 +1,7 @@
 import { useFearGreed } from "./hooks/useFearGreed";
 import { useTheme } from "./hooks/useTheme";
 import { ThemeToggle } from "./components/ThemeToggle";
+import { Footer } from "./components/Footer";
 import {
 	ScoreDisplay,
 	SentimentSpectrum,
@@ -11,6 +12,10 @@ import { SystemStatus } from "./components/SystemStatus";
 import { RefreshButton } from "./components/RefreshButton";
 import { MarketsView } from "./components/MarketsView";
 import { MethodologyView } from "./components/MethodologyView";
+import { AboutView } from "./components/AboutView";
+import { TermsView } from "./components/TermsView";
+import { DisclaimerView } from "./components/DisclaimerView";
+import { DataSourcesView } from "./components/DataSourcesView";
 import type { ConsensusResult } from "./types";
 import { sentimentLabel } from "./utils/sentiment";
 import React, { useState } from "react";
@@ -371,13 +376,35 @@ function AppContent() {
 		useFearGreed();
 	const { theme, toggleTheme } = useTheme();
 	const [activeTab, setActiveTab] = useState<
-		"overview" | "markets" | "methodology"
+		| "overview"
+		| "markets"
+		| "methodology"
+		| "about"
+		| "terms"
+		| "disclaimer"
+		| "datasources"
 	>("overview");
 	const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
 	const renderTabContent = () => {
 		if (activeTab === "methodology") {
 			return <MethodologyView />;
+		}
+
+		if (activeTab === "about") {
+			return <AboutView onNavigate={setActiveTab} />;
+		}
+
+		if (activeTab === "terms") {
+			return <TermsView />;
+		}
+
+		if (activeTab === "disclaimer") {
+			return <DisclaimerView />;
+		}
+
+		if (activeTab === "datasources") {
+			return <DataSourcesView />;
 		}
 
 		if (status === "loading") {
@@ -826,50 +853,7 @@ function AppContent() {
 				{renderTabContent()}
 			</main>
 
-			<footer
-				className="py-4 sm:py-8 px-6 sm:px-8 lg:px-12"
-				style={{
-					borderTop: "1px solid var(--color-border)",
-					background: "var(--color-bg-raised)",
-				}}
-			>
-				<div
-					className="max-w-7xl mx-auto"
-					style={{ marginLeft: "auto", marginRight: "auto" }}
-				>
-					<div className="flex flex-col items-center justify-center gap-4 text-center">
-						<div className="flex items-center gap-2">
-							<svg
-								width="16"
-								height="16"
-								viewBox="0 0 24 24"
-								fill="none"
-								stroke="currentColor"
-								strokeWidth="2"
-								strokeLinecap="round"
-								strokeLinejoin="round"
-								style={{ color: "var(--color-text-tertiary)" }}
-							>
-								<polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
-							</svg>
-							<span
-								className="text-xs font-semibold"
-								style={{ color: "var(--color-text-secondary)" }}
-							>
-								FGI Hub aggregates multiple sentiment sources
-							</span>
-						</div>
-						<p
-							className="text-xs"
-							style={{ color: "var(--color-text-tertiary)" }}
-						>
-							{__FGI_DATA_MODE__ === "prod"
-								? "Using live production data from external APIs."
-								: "Uses mock data for initial development. Data is simulated and not from live APIs."}
-						</p>
-					</div>
-				</div>
-			</footer>
+			<Footer onNavigate={setActiveTab} />
 		</div>
 	);
 }

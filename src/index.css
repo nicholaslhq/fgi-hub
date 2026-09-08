@@ -416,7 +416,10 @@ body {
 	color: var(--color-text-secondary);
 	text-decoration: none;
 	border-radius: 8px;
-	transition: all 0.2s ease;
+	transition:
+		transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+		background 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+		color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 	cursor: pointer;
 	background: none;
 	border: none;
@@ -425,6 +428,12 @@ body {
 .nav-link:hover {
 	color: var(--color-text-primary);
 	background: var(--color-bg-sunken);
+}
+
+@media (min-width: 768px) {
+	.nav-link:hover {
+		transform: translateY(-2px);
+	}
 }
 
 .nav-link.active {
@@ -841,6 +850,81 @@ body {
 	.provider-breakdown-table td:last-child {
 		margin-bottom: 0;
 	}
+}
+
+/* Footer */
+.footer-link {
+	display: inline-flex;
+	align-items: center;
+	min-height: 44px;
+	padding: 10px 14px;
+	font-size: 14px;
+	font-weight: 500;
+	color: var(--color-text-secondary);
+	text-decoration: none;
+	border-radius: 8px;
+	transition:
+		transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+		background 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+		color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+	cursor: pointer;
+	background: none;
+	border: none;
+	transform: translateY(0);
+}
+
+.footer-link:hover {
+	color: var(--color-text-primary);
+	background: var(--color-bg-sunken);
+	transform: translateY(-2px);
+}
+
+.footer-link:focus-visible {
+	outline: 2px solid var(--color-accent);
+	outline-offset: 2px;
+}
+
+.inline-link {
+	display: inline-flex;
+	align-items: center;
+	gap: 4px;
+	padding: 0;
+	font-size: inherit;
+	font-weight: 500;
+	line-height: inherit;
+	color: var(--color-accent);
+	background: none;
+	border: none;
+	border-radius: 0;
+	cursor: pointer;
+	transition: color 0.2s ease;
+	text-decoration: none;
+	position: relative;
+}
+
+.inline-link::after {
+	content: "";
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	width: 100%;
+	height: 2px;
+	background: var(--color-accent);
+	transform: scaleX(0);
+	transform-origin: bottom right;
+	transition: transform 0.3s ease;
+	border-radius: 1px;
+}
+
+.inline-link:hover::after {
+	transform: scaleX(1);
+	transform-origin: bottom left;
+}
+
+.inline-link:focus-visible {
+	outline: 2px solid var(--color-accent);
+	outline-offset: 2px;
+	border-radius: 2px;
 }
 
 /* Auto-fit text */
