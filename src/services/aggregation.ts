@@ -11,9 +11,9 @@ import { sentimentLabel } from "../utils/sentiment.js";
 // Every threshold has a statistical rationale. None are tuned to a specific
 // dataset; the framework adapts to any input distribution.
 
-const STALE_THRESHOLD_MS = 24 * 60 * 60_000; // 24 hours — accommodates daily-refresh data sources
-
-const RECENCY_TAU_MIN = 5; // exponential half-life for age decay
+const RECENCY_TAU_MIN = 120; // exponential half-life for base age decay (2 hours)
+const FRESHNESS_WINDOW_MIN = 4 * 60; // 4 hours — staleness penalty applies after this
+const STALENESS_PENALTY_TAU_MIN = 60; // 1 hour half-life for staleness penalty
 const OUTLIER_ROBUST_K = 3.5; // robust z-score threshold (Iglewicz & Hoaglin)
 const TRIM_FRACTION = 0.2; // fraction trimmed from each tail
 const CONFIDENCE_Z_95 = 1.96; // 95% normal CI critical value
@@ -103,11 +103,8 @@ function validateAndWeightProviders(
 	now: number,
 ): {
 	weighted: WeightedProvider[];
-	staleCount: number;
-	errorCount: number;
 } {
 	const weighted: WeightedProvider[] = [];
-	let staleCount = 0;
 	let errorCount = 0;
 
 	for (const p of providers) {
@@ -134,15 +131,14 @@ function validateAndWeightProviders(
 			continue;
 		}
 
-		if (ageMinutes > STALE_THRESHOLD_MS / 60_000) {
-			staleCount++;
-			continue;
-		}
-
 		const confidence = p.confidence ?? 0.5;
 		const clampedConfidence = clamp(confidence, 0, 1);
 		const recencyWeight = Math.exp(-ageMinutes / RECENCY_TAU_MIN);
-		const weight = clampedConfidence * recencyWeight;
+		const stalenessPenalty = Math.exp(
+			-Math.max(0, ageMinutes - FRESHNESS_WINDOW_MIN) /
+				STALENESS_PENALTY_TAU_MIN,
+		);
+		const weight = clampedConfidence * recencyWeight * stalenessPenalty;
 
 		weighted.push({
 			provider: p,
@@ -153,7 +149,7 @@ function validateAndWeightProviders(
 		});
 	}
 
-	return { weighted, staleCount, errorCount };
+	return { weighted };
 }
 
 // ── Phase 2: Outlier Detection (MAD-based) ─────────────────────────────────
@@ -592,4 +588,7 @@ export {
 	median,
 	effectiveSampleSize,
 	normalizeWeights,
+	RECENCY_TAU_MIN,
+	FRESHNESS_WINDOW_MIN,
+	STALENESS_PENALTY_TAU_MIN,
 };

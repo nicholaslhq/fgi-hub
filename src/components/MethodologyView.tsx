@@ -240,10 +240,12 @@ export function MethodologyView() {
 			<Section title="Data Freshness">
 				<p>
 					Provider data is refreshed on demand. Scores are
-					timestamped, and any provider that has not updated within
-					the last 15 minutes is excluded from the consensus. Within
-					the freshness window, newer data carries proportionally more
-					weight via exponential recency decay.
+					timestamped, and each provider's influence decays
+					continuously with age via exponential recency decay.
+					After a 4-hour freshness window, an additional
+					staleness penalty accelerates the decay, gracefully
+					reducing the weight of older data rather than
+					excluding it entirely.
 				</p>
 			</Section>
 
@@ -281,18 +283,18 @@ export function MethodologyView() {
 								className="font-mono"
 								style={{ color: "var(--color-text-primary)" }}
 							>
-								wᵢ = confidenceᵢ × e^(−ageᵢ / τ) ×
-								staleness_penaltyᵢ
+								wᵢ = confidenceᵢ × e^(−ageᵢ / τᵣ) × e^(−max(0, ageᵢ − W) / τₛ)
 							</code>
 						</p>
 						<p
 							className="text-xs mt-1"
 							style={{ color: "var(--color-text-tertiary)" }}
 						>
-							Where τ = 5 min sets the recency half-life,
-							confidence comes from the provider, and staleness
-							penalty gradually reduces weight for providers aged
-							beyond 70% of the freshness window.
+							Where τᵣ = 120 min sets the base recency half-life,
+							W = 240 min is the freshness window, and τₛ = 60 min
+							is the staleness penalty half-life. Providers older
+							than the window are gradually penalized rather than
+							binary-excluded.
 						</p>
 					</div>
 
@@ -341,7 +343,7 @@ export function MethodologyView() {
 							/>
 							<StrategyCard
 								strategy="Trimmed Mean"
-								description="Removes flagged outliers, then applies reliability-weighted averaging."
+								description="Removes flagged outliers, applies symmetric trimming (20% from each tail), then computes reliability-weighted average."
 							/>
 							<StrategyCard
 								strategy="Bayesian Shrinkage"
@@ -396,7 +398,33 @@ export function MethodologyView() {
 										color: "var(--color-text-primary)",
 									}}
 								>
-									n &lt; 3
+									n = 0
+								</strong>
+								→ Fallback (no valid providers)
+							</div>
+							<div
+								className="text-xs"
+								style={{ color: "var(--color-text-tertiary)" }}
+							>
+								<strong
+									style={{
+										color: "var(--color-text-primary)",
+									}}
+								>
+									n = 1
+								</strong>
+								→ Single provider
+							</div>
+							<div
+								className="text-xs"
+								style={{ color: "var(--color-text-tertiary)" }}
+							>
+								<strong
+									style={{
+										color: "var(--color-text-primary)",
+									}}
+								>
+									n = 2
 								</strong>
 								→ Bayesian shrinkage (small-sample
 								regularization)
@@ -423,9 +451,9 @@ export function MethodologyView() {
 										color: "var(--color-text-primary)",
 									}}
 								>
-									Robust CV &gt; 0.25
+									Outliers present, CV &gt; 0.25
 								</strong>
-								→ Median (high disagreement)
+								→ Median (high disagreement with anomalies)
 							</div>
 							<div
 								className="text-xs"
@@ -436,9 +464,23 @@ export function MethodologyView() {
 										color: "var(--color-text-primary)",
 									}}
 								>
-									Outliers present, CV &gt; 0.20
+									Outliers present, CV &le; 0.25
 								</strong>
-								→ Trimmed mean (remove outliers, then weight)
+								→ Trimmed mean (outlier removal + symmetric
+								trim + reliability weighting)
+							</div>
+							<div
+								className="text-xs"
+								style={{ color: "var(--color-text-tertiary)" }}
+							>
+								<strong
+									style={{
+										color: "var(--color-text-primary)",
+									}}
+								>
+									n &ge; 7, mean confidence &lt; 0.6
+								</strong>
+								→ Trimmed mean (low provider trust)
 							</div>
 							<div
 								className="text-xs"
@@ -473,16 +515,18 @@ export function MethodologyView() {
 						color: "var(--color-text-primary)",
 					}}
 				>
-					Confidence = (n/(n+2)) × (1−CV) × (1−2×outlier_ratio) ×
-					mean_confidence × (effective_n/n) × stability
+					confidence = clamp( [ciScore×0.60 + meanConf×0.25 + quality×0.15], 0, 1 )
 				</div>
 				<p
 					className="text-xs mt-1"
 					style={{ color: "var(--color-text-tertiary)" }}
 				>
-					Each factor is clamped to [0, 1] and the product is clamped
-					to [0, 1]. A score of 0.90 means high certainty that the
-					true consensus falls within the reported range.
+					ciScore = max(0, 1 − (ciUpper − ciLower)/100). quality =
+					sizeQuality×0.15 + dispersionQuality×0.35 +
+					outlierQuality×0.25 + effectiveNQuality×0.25. Each
+					component is clamped to [0, 1] before blending. A score of
+					0.90 means high certainty that the true consensus falls
+					within the reported range.
 				</p>
 			</Section>
 
@@ -533,7 +577,7 @@ export function MethodologyView() {
 					<MetricDoc
 						name="Strategy"
 						definition="The aggregation method selected by the ARA framework's Phase 5 rules. It indicates which statistical estimator produced the final consensus score."
-						calculation="Deterministic branching: n<3 → bayesian_shrinkage; outlierRatio≥0.4 → median; robustCV>0.25 → median; outliers+CV>0.20 → trimmed_mean; else → weighted_mean."
+						calculation="Deterministic branching: n=0→fallback; n=1→single_provider; n=2→bayesian_shrinkage; outlierRatio≥0.4→median; outliers+CV>0.25→median; outliers+CV≤0.25→trimmed_mean; n≥7+meanConf<0.6→trimmed_mean; else→weighted_mean."
 						interpretation="weighted_mean = clean, confident data. median = high disagreement or many outliers. trimmed_mean = moderate outliers with manageable dispersion. bayesian_shrinkage = very few providers (&lt;3). fallback = no valid providers."
 					/>
 					<MetricDoc
@@ -551,13 +595,13 @@ export function MethodologyView() {
 					<MetricDoc
 						name="Median"
 						definition="The middle value of the active provider scores when sorted. A robust measure of central tendency unaffected by extreme values."
-						calculation="median = sorted_scores[⌊n/2⌋] for odd n; average of sorted_scores[n/2−1] and sorted_scores[n/2] for even n."
+						calculation="median = sorted_scores[⌊n/2⌋] for odd n; round(average of sorted_scores[n/2−1] and sorted_scores[n/2]) for even n."
 						interpretation="When the strategy is median, this is the consensus. When displayed alongside the consensus, a large gap between median and consensus indicates the weighted average was pulled toward a cluster of high-confidence providers."
 					/>
 					<MetricDoc
 						name="Standard Deviation (Std Dev)"
 						definition="The average dispersion of active provider scores around their arithmetic mean. Measures typical deviation in score units."
-						calculation="σ = √( Σ(scoreᵢ − mean)² / n ), where mean is the simple average of all active scores."
+						calculation="σ = √( Σ(scoreᵢ − mean)² / n ), where mean = round( Σ(scoreᵢ) / n ) is the rounded simple average."
 						interpretation="σ &lt; 10 = tight consensus; 10–20 = moderate spread; &gt;20 = high disagreement among providers. High std dev does not necessarily invalidate the consensus, but it warrants checking the outlier ratio and CI width."
 					/>
 					<MetricDoc

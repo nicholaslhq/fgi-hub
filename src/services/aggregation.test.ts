@@ -334,7 +334,7 @@ describe("aggregate", () => {
 		expect(result!.score).toBeLessThan(75); // regularized toward neutral
 	});
 
-  it("excludes stale providers", () => {
+  it("includes stale providers with penalized weight", () => {
     const providers = [
       makeProvider(80, { confidence: 0.9 }),
       makeProvider(70, {
@@ -344,7 +344,8 @@ describe("aggregate", () => {
     ];
     const result = aggregate("stock", providers);
     expect(result).not.toBeNull();
-    expect(result!.providerCount).toBe(1);
+    expect(result!.providerCount).toBe(2);
+    expect(result!.score).toBeGreaterThan(60);
   });
 
 	it("computes confidence interval that contains the score", () => {

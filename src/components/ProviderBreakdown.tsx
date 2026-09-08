@@ -1,6 +1,11 @@
 import { useState, useMemo } from "react";
 import type { ConsensusResult } from "../types";
-import { detectOutliers } from "../services/aggregation";
+import {
+	detectOutliers,
+	RECENCY_TAU_MIN,
+	FRESHNESS_WINDOW_MIN,
+	STALENESS_PENALTY_TAU_MIN,
+} from "../services/aggregation";
 import { isStale } from "../utils/time";
 import { getSentimentColor } from "./SentimentSpectrum";
 import { Timestamp } from "./Timestamp";
@@ -9,7 +14,7 @@ import { useTimeTicker } from "../hooks/useTimeTicker";
 type SortKey = "score" | "deviation" | "weight" | "confidence" | "age" | "name";
 type SortDir = "asc" | "desc";
 
-const RECENCY_TAU = 5;
+const RECENCY_TAU = RECENCY_TAU_MIN;
 
 function formatAge(minutes: number): string {
 	if (minutes < 1) return "just now";
@@ -66,7 +71,14 @@ export function ProviderBreakdown({
 				const confidence = p.confidence ?? 0.5;
 				const ageMinutes =
 					(now - new Date(p.timestamp).getTime()) / 60000;
-				return confidence * Math.exp(-ageMinutes / RECENCY_TAU);
+				return (
+					confidence *
+					Math.exp(-ageMinutes / RECENCY_TAU) *
+					Math.exp(
+						-Math.max(0, ageMinutes - FRESHNESS_WINDOW_MIN) /
+							STALENESS_PENALTY_TAU_MIN,
+					)
+				);
 			}),
 			0.001,
 		);
@@ -78,9 +90,16 @@ export function ProviderBreakdown({
 			const ageMinutes = hasError
 				? null
 				: (now - new Date(p.timestamp).getTime()) / 60000;
-			const weight = hasError
-				? 0
-				: confidence * Math.exp(-(ageMinutes ?? 0) / RECENCY_TAU);
+		const weight = hasError
+			? 0
+			: confidence *
+				Math.exp(-(ageMinutes ?? 0) / RECENCY_TAU) *
+				Math.exp(
+					-Math.max(
+						0,
+						(ageMinutes ?? 0) - FRESHNESS_WINDOW_MIN,
+					) / STALENESS_PENALTY_TAU_MIN,
+				);
 			const deviation = hasError ? null : p.score - data.score;
 
 			return {
