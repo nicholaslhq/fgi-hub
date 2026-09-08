@@ -721,7 +721,18 @@ function AppContent() {
 						</div>
 
 						<div className="hidden md:flex items-center gap-3">
-							<div className="flex items-center gap-3">
+							<button
+								onClick={() => {
+									setActiveTab("overview");
+									refresh();
+									window.scrollTo({
+										top: 0,
+										behavior: "smooth",
+									});
+								}}
+								className="flex items-center gap-3 bg-transparent border-0 p-0 cursor-pointer"
+								aria-label="Go to home page"
+							>
 								<svg
 									width="28"
 									height="28"
@@ -743,11 +754,20 @@ function AppContent() {
 								>
 									FGI Hub
 								</span>
-							</div>
+							</button>
 						</div>
 
-						<div className="flex md:hidden items-center gap-2">
+						<button
+							onClick={() => {
+								setActiveTab("overview");
+								refresh();
+								window.scrollTo({ top: 0, behavior: "smooth" });
+							}}
+							className="logo-btn flex md:hidden items-center gap-2"
+							aria-label="Go to home page"
+						>
 							<svg
+								className="logo-icon"
 								width="24"
 								height="24"
 								viewBox="0 0 24 24"
@@ -761,14 +781,14 @@ function AppContent() {
 								<polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
 							</svg>
 							<span
-								className="font-mono font-semibold uppercase tracking-widest text-sm"
+								className="font-mono font-semibold uppercase tracking-widest text-sm logo-text"
 								style={{
 									color: "var(--color-text-primary)",
 								}}
 							>
 								FGI Hub
 							</span>
-						</div>
+						</button>
 
 						<nav className="hidden md:flex items-center gap-1">
 							<button
