@@ -13,6 +13,7 @@ import { useTimeTicker } from "../hooks/useTimeTicker";
 
 type SortKey = "score" | "deviation" | "weight" | "confidence" | "age" | "name";
 type SortDir = "asc" | "desc";
+type StatusFilter = "active" | "stale" | "error" | null;
 
 const RECENCY_TAU = RECENCY_TAU_MIN;
 
@@ -50,6 +51,7 @@ export function ProviderBreakdown({
 }) {
 	const [sortKey, setSortKey] = useState<SortKey>("score");
 	const [sortDir, setSortDir] = useState<SortDir>("desc");
+	const [statusFilter, setStatusFilter] = useState<StatusFilter>(null);
 	const now = useTimeTicker();
 
 	const enriched = useMemo<EnrichedProvider[]>(() => {
@@ -162,6 +164,11 @@ export function ProviderBreakdown({
 		return arr;
 	}, [enriched, sortKey, sortDir]);
 
+	const visibleRows = useMemo(() => {
+		if (!statusFilter) return sorted;
+		return sorted.filter((p) => p.status === statusFilter);
+	}, [sorted, statusFilter]);
+
 	const activeCount = enriched.filter((p) => p.status === "active").length;
 	const staleCount = enriched.filter((p) => p.status === "stale").length;
 	const errorCount = enriched.filter((p) => p.status === "error").length;
@@ -220,41 +227,31 @@ export function ProviderBreakdown({
 							>
 								·
 							</span>
-							<span style={{ color: "var(--color-greed)" }}>
-								{activeCount} active
-							</span>
-							{staleCount > 0 && (
-								<>
-									<span
-										className="hidden sm:inline"
-										style={{ color: "var(--color-border)" }}
-									>
-										·
-									</span>
-									<span
-										style={{
-											color: "var(--color-neutral)",
-										}}
-									>
-										{staleCount} stale
-									</span>
-								</>
-							)}
-							{errorCount > 0 && (
-								<>
-									<span
-										className="hidden sm:inline"
-										style={{ color: "var(--color-border)" }}
-									>
-										·
-									</span>
-									<span
-										style={{ color: "var(--color-fear)" }}
-									>
-										{errorCount} errors
-									</span>
-								</>
-							)}
+							<div
+								className="flex items-center gap-2 flex-wrap"
+								role="group"
+								aria-label="Provider status filter"
+							>
+								{([
+									{ status: "active" as const, label: "active", count: activeCount, colorVar: "var(--color-greed)" },
+									{ status: "stale" as const, label: "stale", count: staleCount, colorVar: "var(--color-neutral)" },
+									{ status: "error" as const, label: "errors", count: errorCount, colorVar: "var(--color-fear)" },
+								]).map((item) => {
+									const isActive = statusFilter === item.status;
+									return (
+										<button
+											key={item.status}
+											type="button"
+											aria-pressed={isActive}
+											onClick={() => setStatusFilter(isActive ? null : item.status)}
+											className={`status-legend-item ${isActive ? "status-legend-item--active" : ""}`}
+											style={{ color: item.colorVar }}
+										>
+											{item.count} {item.label}
+										</button>
+									);
+								})}
+							</div>
 							{outlierCount > 0 && (
 								<>
 									<span
@@ -330,8 +327,19 @@ export function ProviderBreakdown({
 							</tr>
 						</thead>
 						<tbody>
-							{sorted.map((p) => (
-								<tr key={p.provider}>
+							{visibleRows.length === 0 ? (
+								<tr>
+									<td colSpan={6} className="text-center" style={{ padding: "32px 12px", color: "var(--color-text-tertiary)" }}>
+										No providers match the selected filter.
+									</td>
+								</tr>
+							) : (
+								visibleRows.map((p, index) => (
+									<tr
+										key={p.provider}
+										className="provider-breakdown-table-row"
+										style={{ animationDelay: `${Math.min(index * 30, 300)}ms` }}
+									>
 									<td data-label="Provider">
 										<div className="flex items-center gap-3 flex-1 min-w-0">
 											<div
@@ -508,7 +516,8 @@ export function ProviderBreakdown({
 										</p>
 									</td>
 								</tr>
-							))}
+								))
+							)}
 						</tbody>
 					</table>
 				</div>
