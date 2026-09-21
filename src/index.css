@@ -897,6 +897,20 @@ body {
 	animation: provider-row-in 0.3s ease both;
 }
 
+.provider-list-extra {
+	max-height: 0;
+	overflow: hidden;
+	opacity: 0;
+	transition:
+		max-height 0.4s ease,
+		opacity 0.3s ease;
+}
+
+.provider-list-extra.is-open {
+	max-height: 500px;
+	opacity: 1;
+}
+
 /* Footer */
 .footer-link {
 	display: inline-flex;

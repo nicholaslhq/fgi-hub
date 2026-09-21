@@ -1,3 +1,4 @@
+import { useState } from "react";
 import type { ConsensusResult } from "../types";
 import { formatStrategyName } from "../utils/formatters";
 import { isStale } from "../utils/time";
@@ -47,6 +48,9 @@ export function ProviderConsensus({
 			: confidencePct >= 45
 				? "var(--color-neutral)"
 				: "var(--color-fear)";
+
+		const [expanded, setExpanded] = useState(false);
+		const hasMore = data.providers.length > 5;
 
 	return (
 		<div
@@ -119,14 +123,54 @@ export function ProviderConsensus({
 			</div>
 
 			<div className="space-y-1">
-				{data.providers.map((provider) => (
+				{data.providers.slice(0, 5).map((provider) => (
 					<ProviderRow
 						key={provider.provider}
 						provider={provider}
 						theme={theme}
 					/>
 				))}
+				{hasMore && (
+					<div
+						className={`provider-list-extra ${expanded ? "is-open" : ""}`}
+					>
+						{data.providers.slice(5).map((provider) => (
+							<ProviderRow
+								key={provider.provider}
+								provider={provider}
+								theme={theme}
+							/>
+						))}
+					</div>
+				)}
 			</div>
+			{hasMore && (
+		<div className="mt-4 flex justify-center">
+				<button
+					type="button"
+					className="icon-btn"
+					onClick={() => setExpanded(!expanded)}
+					aria-label={expanded ? "Show less providers" : "Show more providers"}
+				>
+					<svg
+						width="16"
+						height="16"
+						viewBox="0 0 24 24"
+						fill="none"
+						stroke="currentColor"
+						strokeWidth="2"
+						strokeLinecap="round"
+						strokeLinejoin="round"
+					>
+						{expanded ? (
+							<polyline points="18 15 12 9 6 15" />
+						) : (
+							<polyline points="6 9 12 15 18 9" />
+						)}
+					</svg>
+				</button>
+			</div>
+			)}
 			<div
 				className="flex flex-wrap items-center gap-4 sm:gap-6 mt-6 pt-5"
 				style={{ borderTop: "1px solid var(--color-border-subtle)" }}

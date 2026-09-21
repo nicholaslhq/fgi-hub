@@ -596,7 +596,7 @@ function AppContent() {
 						theme={theme}
 					/>
 
-					<div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+					<div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 items-start">
 						<ProviderConsensus
 							data={stock}
 							market="stock"
