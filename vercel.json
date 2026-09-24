@@ -1,7 +1,6 @@
 {
   "buildCommand": "npm run build && npm run build:server",
   "outputDirectory": "dist",
-  "runtime": "nodejs22.x",
   "env": {
     "FGI_DATA_MODE": "prod"
   }
