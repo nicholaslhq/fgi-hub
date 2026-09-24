@@ -29,6 +29,15 @@ export function Footer({
 	const mode = dataMode ?? __FGI_DATA_MODE__;
 	const isProdMode = mode === "prod";
 
+	const scrollToTop = () => {
+		window.scrollTo({ top: 0, behavior: "smooth" });
+	};
+
+	const handleNavigate = (tab: Parameters<NonNullable<typeof onNavigate>>[0]) => {
+		scrollToTop();
+		onNavigate?.(tab);
+	};
+
 	let label: string;
 	if (status === "error") {
 		label = isProdMode
@@ -57,7 +66,7 @@ export function Footer({
 								<button
 									type="button"
 									className="footer-link"
-									onClick={() => onNavigate?.("overview")}
+									onClick={() => handleNavigate("overview")}
 								>
 									Overview
 								</button>
@@ -66,7 +75,7 @@ export function Footer({
 								<button
 									type="button"
 									className="footer-link"
-									onClick={() => onNavigate?.("markets")}
+									onClick={() => handleNavigate("markets")}
 								>
 									Markets
 								</button>
@@ -75,7 +84,7 @@ export function Footer({
 								<button
 									type="button"
 									className="footer-link"
-									onClick={() => onNavigate?.("methodology")}
+									onClick={() => handleNavigate("methodology")}
 								>
 									Methodology
 								</button>
@@ -92,7 +101,7 @@ export function Footer({
 								<button
 									type="button"
 									className="footer-link"
-									onClick={() => onNavigate?.("disclaimer")}
+									onClick={() => handleNavigate("disclaimer")}
 								>
 									Disclaimer
 								</button>
@@ -101,7 +110,7 @@ export function Footer({
 								<button
 									type="button"
 									className="footer-link"
-									onClick={() => onNavigate?.("terms")}
+									onClick={() => handleNavigate("terms")}
 								>
 									Terms of Service
 								</button>
@@ -110,7 +119,7 @@ export function Footer({
 								<button
 									type="button"
 									className="footer-link"
-									onClick={() => onNavigate?.("datasources")}
+									onClick={() => handleNavigate("datasources")}
 								>
 									Data Sources
 								</button>
@@ -137,7 +146,7 @@ export function Footer({
 								<button
 									type="button"
 									className="footer-link"
-									onClick={() => onNavigate?.("about")}
+									onClick={() => handleNavigate("about")}
 								>
 									About
 								</button>
