@@ -877,7 +877,9 @@ function AppContent() {
 
 			<main
 				className={`flex-1 w-full max-w-7xl px-6 sm:px-8 lg:px-12 py-12 sm:py-20 ${
-					status === "loading" ? "min-h-screen flex items-center justify-center" : ""
+					status === "loading" || status === "error"
+						? "min-h-screen flex items-center justify-center"
+						: ""
 				}`}
 				style={{ marginLeft: "auto", marginRight: "auto" }}
 			>
