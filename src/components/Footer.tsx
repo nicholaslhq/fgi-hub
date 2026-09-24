@@ -30,12 +30,14 @@ export function Footer({
 	const isProdMode = mode === "prod";
 
 	let label: string;
-	if (status === "loading" || apiAvailable === null) {
+	if (status === "error") {
+		label = isProdMode
+			? DATA_SOURCE_ERROR_LABEL
+			: DATA_MODE_LABELS.mock;
+	} else if (status === "loading" || apiAvailable === null) {
 		label = DATA_SOURCE_LOADING_LABEL;
 	} else if (isProdMode) {
-		label = apiAvailable
-			? DATA_MODE_LABELS.prod
-			: DATA_SOURCE_ERROR_LABEL;
+		label = DATA_MODE_LABELS.prod;
 	} else {
 		label = apiAvailable
 			? DATA_MODE_LABELS.prod

@@ -97,6 +97,9 @@ export function useFearGreed() {
 					: "Failed to load sentiment data",
 			);
 			setStatus("error");
+			if (isProdMode) {
+				setApiAvailable(false);
+			}
 		}
 	}, [isProdMode]);
 
