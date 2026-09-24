@@ -146,7 +146,7 @@ export function Footer({
 
 				<div className="mt-8 sm:mt-12 pt-6 border-t border-[var(--color-border-subtle)]">
 					<div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
-						<div className="flex items-center gap-2">
+						<div className="flex items-center gap-2 justify-center sm:justify-start">
 							<svg
 								width="16"
 								height="16"
@@ -171,7 +171,7 @@ export function Footer({
 						</span>
 					</div>
 
-					<p className="mt-4 text-xs text-[var(--color-text-tertiary)]">
+					<p className="mt-4 text-xs text-[var(--color-text-tertiary)] text-center sm:text-left">
 						{label}
 					</p>
 				</div>
