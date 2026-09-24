@@ -28,27 +28,42 @@ export function useFearGreed() {
 	const [status, setStatus] = useState<ProviderStatus>("idle");
 	const [lastRefreshed, setLastRefreshed] = useState<string | null>(null);
 	const [error, setError] = useState<string | null>(null);
+	const [apiAvailable, setApiAvailable] = useState<boolean | null>(null);
 
 	const prevStockScoreRef = useRef<number | null>(null);
 	const prevCryptoScoreRef = useRef<number | null>(null);
 	const useApiRef = useRef<boolean | null>(null);
 
+	const isProdMode = __FGI_DATA_MODE__ === "prod";
+
 	const refresh = useCallback(async () => {
 		setStatus("loading");
 		setError(null);
 		try {
-			let data;
+			let data: { stock: ConsensusResult; crypto: ConsensusResult };
 
-			if (useApiRef.current === null) {
+			// In prod mode, never fall back to mock data
+			if (isProdMode) {
+				const [stockResult, cryptoResult] = await Promise.all([
+					fetchStockFromApi(),
+					fetchCryptoFromApi(),
+				]);
+				useApiRef.current = true;
+				setApiAvailable(true);
+				data = { stock: stockResult, crypto: cryptoResult };
+			} else if (useApiRef.current === null) {
+				// Auto-detect API availability in mock mode
 				try {
 					const [stockResult, cryptoResult] = await Promise.all([
 						fetchStockFromApi(),
 						fetchCryptoFromApi(),
 					]);
 					useApiRef.current = true;
+					setApiAvailable(true);
 					data = { stock: stockResult, crypto: cryptoResult };
 				} catch {
 					useApiRef.current = false;
+					setApiAvailable(false);
 					data = await refreshAll({
 						previousStockScore: prevStockScoreRef.current ?? undefined,
 						previousCryptoScore: prevCryptoScoreRef.current ?? undefined,
@@ -59,8 +74,10 @@ export function useFearGreed() {
 					fetchStockFromApi(),
 					fetchCryptoFromApi(),
 				]);
+				setApiAvailable(true);
 				data = { stock: stockResult, crypto: cryptoResult };
 			} else {
+				setApiAvailable(false);
 				data = await refreshAll({
 					previousStockScore: prevStockScoreRef.current ?? undefined,
 					previousCryptoScore: prevCryptoScoreRef.current ?? undefined,
@@ -81,11 +98,11 @@ export function useFearGreed() {
 			);
 			setStatus("error");
 		}
-	}, []);
+	}, [isProdMode]);
 
 	useEffect(() => {
 		refresh();
 	}, [refresh]);
 
-	return { stock, crypto, status, lastRefreshed, error, refresh };
+	return { stock, crypto, status, lastRefreshed, error, refresh, apiAvailable };
 }

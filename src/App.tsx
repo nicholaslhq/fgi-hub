@@ -372,8 +372,15 @@ function describeSynthesis(
 }
 
 function AppContent() {
-	const { stock, crypto, status, lastRefreshed, error, refresh } =
-		useFearGreed();
+	const {
+		stock,
+		crypto,
+		status,
+		lastRefreshed,
+		error,
+		refresh,
+		apiAvailable,
+	} = useFearGreed();
 	const { theme, toggleTheme } = useTheme();
 	const [activeTab, setActiveTab] = useState<
 		| "overview"
@@ -469,10 +476,12 @@ function AppContent() {
 							Unable to load sentiment data
 						</p>
 						<p
-							className="text-base mt-3"
-							style={{ color: "var(--color-text-tertiary)" }}
+						 className="text-base mt-3"
+						 style={{ color: "var(--color-text-tertiary)" }}
 						>
-							{error || "Unknown error"}
+							{__FGI_DATA_MODE__ === "prod"
+								? "The API endpoints are unavailable. Please check your network connection or try again later."
+								: error || "Unknown error"}
 						</p>
 					</div>
 					<button onClick={refresh} className="btn btn-primary">
@@ -875,7 +884,12 @@ function AppContent() {
 				{renderTabContent()}
 			</main>
 
-			<Footer onNavigate={setActiveTab} />
+			<Footer
+			onNavigate={setActiveTab}
+			dataMode={__FGI_DATA_MODE__}
+			apiAvailable={apiAvailable}
+			status={status}
+		/>
 		</div>
 	);
 }

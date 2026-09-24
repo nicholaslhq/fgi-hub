@@ -1,0 +1,18 @@
+{
+  "compilerOptions": {
+    "target": "es2023",
+    "lib": ["ES2023"],
+    "types": ["node"],
+    "skipLibCheck": true,
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
+    "verbatimModuleSyntax": true,
+    "moduleDetection": "force",
+    "outDir": "dist/server",
+    "rootDir": "src",
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "resolveJsonModule": true
+  },
+  "include": ["src/server/index.ts", "src/services/index.server.ts", "src/services/aggregation.ts", "src/services/providers/serverStock.providers.ts", "src/services/providers/serverCrypto.providers.ts", "src/types/index.ts", "src/utils/errors.ts"]
+}

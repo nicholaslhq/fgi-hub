@@ -3,8 +3,14 @@ const DATA_MODE_LABELS: Record<string, string> = {
 	mock: "Uses mock data for initial development. Data is simulated and not from live APIs.",
 };
 
+const DATA_SOURCE_ERROR_LABEL = "Unable to load live production data — API endpoints unavailable";
+const DATA_SOURCE_LOADING_LABEL = "Loading live production data...";
+
 export function Footer({
 	onNavigate,
+	dataMode,
+	apiAvailable,
+	status,
 }: {
 	onNavigate?: (
 		tab:
@@ -16,8 +22,25 @@ export function Footer({
 			| "disclaimer"
 			| "datasources",
 	) => void;
+	dataMode?: string;
+	apiAvailable?: boolean | null;
+	status?: string;
 }) {
-	const dataMode = __FGI_DATA_MODE__;
+	const mode = dataMode ?? __FGI_DATA_MODE__;
+	const isProdMode = mode === "prod";
+
+	let label: string;
+	if (status === "loading" || apiAvailable === null) {
+		label = DATA_SOURCE_LOADING_LABEL;
+	} else if (isProdMode) {
+		label = apiAvailable
+			? DATA_MODE_LABELS.prod
+			: DATA_SOURCE_ERROR_LABEL;
+	} else {
+		label = apiAvailable
+			? DATA_MODE_LABELS.prod
+			: DATA_MODE_LABELS.mock;
+	}
 
 	return (
 		<footer className="border-t border-[var(--color-border)] bg-[var(--color-bg-raised)]">
@@ -149,7 +172,7 @@ export function Footer({
 					</div>
 
 					<p className="mt-4 text-xs text-[var(--color-text-tertiary)]">
-						{DATA_MODE_LABELS[dataMode] ?? DATA_MODE_LABELS.mock}
+						{label}
 					</p>
 				</div>
 			</div>
