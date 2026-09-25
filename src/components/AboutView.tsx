@@ -44,9 +44,9 @@ export function AboutView({
 					className="text-base leading-relaxed"
 					style={{ color: "var(--color-text-secondary)" }}
 				>
-					FGI Hub aggregates fear and greed sentiment data from multiple providers
-					across stock and crypto markets, using an Adaptive Robust Aggregation
-					framework to compute a consensus index.
+					FGI (Fear & Greed Index) Hub aggregates fear and greed sentiment data
+					from multiple providers across stock and crypto markets, using an
+					Adaptive Robust Aggregation framework to compute a consensus index.
 				</p>
 			</div>
 
