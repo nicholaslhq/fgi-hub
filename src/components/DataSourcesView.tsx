@@ -148,18 +148,47 @@ export function DataSourcesView() {
 					className="text-base leading-relaxed max-w-2xl mx-auto"
 					style={{ color: "var(--color-text-secondary)" }}
 				>
-					FGI Hub aggregates sentiment data from multiple external providers.
-					Below is the complete list of all data sources, organized by market.
-					Each source contributes a normalized fear and greed score along with
-					confidence and recency metrics.
+					FGI Hub aggregates sentiment data from multiple external
+					providers. Below is the complete list of all data sources,
+					organized by market. Each source contributes a normalized
+					fear and greed score along with confidence and recency
+					metrics.
 				</p>
 			</div>
 
 			<Section title="Provider Aggregation">
 				<p>
-					The platform collects real-time and near-real-time sentiment signals from
-					various financial data providers. Each provider&apos;s score is normalized
-					to a 0–100 scale and weighted by confidence and data freshness.
+					The platform collects real-time and near-real-time sentiment
+					signals from various financial data providers. Each
+					provider&apos;s score is normalized to a 0–100 scale and
+					weighted by confidence and data freshness.
+				</p>
+			</Section>
+
+			<Section title="Data Freshness">
+				<p>
+					Provider data is timestamped and evaluated for staleness.
+					The Adaptive Robust Aggregation framework adjusts weights
+					based on the age of each data point, ensuring that newer
+					signals have greater influence on the final consensus.
+				</p>
+			</Section>
+
+			<Section title="Transparency">
+				<p>
+					FGI Hub is committed to transparency. The provider breakdown
+					view shows individual provider contributions, weights, and
+					outlier status. Users can inspect how the consensus score is
+					derived from the underlying sources.
+				</p>
+			</Section>
+
+			<Section title="API Availability">
+				<p>
+					Some providers offer public APIs that can be accessed
+					directly. FGI Hub does not redistribute proprietary data
+					feeds; instead, it computes aggregated insights from
+					publicly available endpoints and licensed data feeds.
 				</p>
 			</Section>
 
@@ -168,33 +197,6 @@ export function DataSourcesView() {
 					<MarketSources market="stock" sources={stockSources} />
 					<MarketSources market="crypto" sources={cryptoSources} />
 				</div>
-			</Section>
-
-			<Section title="Data Freshness">
-				<p>
-					Provider data is timestamped and evaluated for staleness. The Adaptive
-					Robust Aggregation framework adjusts weights based on the age of each
-					data point, ensuring that newer signals have greater influence on the
-					final consensus.
-				</p>
-			</Section>
-
-			<Section title="Transparency">
-				<p>
-					FGI Hub is committed to transparency. The provider breakdown view shows
-					individual provider contributions, weights, and outlier status. Users
-					can inspect how the consensus score is derived from the underlying
-					sources.
-				</p>
-			</Section>
-
-			<Section title="API Availability">
-				<p>
-					Some providers offer public APIs that can be accessed directly. FGI Hub
-					does not redistribute proprietary data feeds; instead, it computes
-					aggregated insights from publicly available endpoints and licensed data
-					feeds.
-				</p>
 			</Section>
 		</div>
 	);
