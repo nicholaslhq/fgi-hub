@@ -476,8 +476,8 @@ function AppContent() {
 							Unable to load sentiment data
 						</p>
 						<p
-						 className="text-base mt-3"
-						 style={{ color: "var(--color-text-tertiary)" }}
+							className="text-base mt-3"
+							style={{ color: "var(--color-text-tertiary)" }}
 						>
 							{__FGI_DATA_MODE__ === "prod"
 								? "The API endpoints are unavailable. Please check your network connection or try again later."
@@ -495,7 +495,7 @@ function AppContent() {
 							strokeLinecap="round"
 							strokeLinejoin="round"
 						>
-							<path d="M21 12a9 9 0 11-6.219-8.56" />
+							<path d="M21 12a9 9 0 1 1-2.64-6.36" />
 							<polyline points="21 3 21 9 15 9" />
 						</svg>
 						Retry
@@ -887,11 +887,11 @@ function AppContent() {
 			</main>
 
 			<Footer
-			onNavigate={setActiveTab}
-			dataMode={__FGI_DATA_MODE__}
-			apiAvailable={apiAvailable}
-			status={status}
-		/>
+				onNavigate={setActiveTab}
+				dataMode={__FGI_DATA_MODE__}
+				apiAvailable={apiAvailable}
+				status={status}
+			/>
 		</div>
 	);
 }
