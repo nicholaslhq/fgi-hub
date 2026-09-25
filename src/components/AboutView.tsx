@@ -31,6 +31,11 @@ export function AboutView({
 }: {
 	onNavigate?: (tab: "overview" | "markets" | "methodology" | "about" | "terms" | "disclaimer" | "datasources") => void;
 }) {
+	const handleNavigate = (tab: Parameters<NonNullable<typeof onNavigate>>[0]) => {
+		window.scrollTo({ top: 0, behavior: "smooth" });
+		onNavigate?.(tab);
+	};
+
 	return (
 		<div className="max-w-3xl mx-auto space-y-6">
 			<div className="text-center mb-12">
@@ -74,7 +79,7 @@ export function AboutView({
 					and timestamp. 					For a complete list of sources, see the{" "}
 					<button
 						type="button"
-						onClick={() => onNavigate?.("datasources")}
+						onClick={() => handleNavigate("datasources")}
 						className="inline-link"
 					>
 						Data Sources

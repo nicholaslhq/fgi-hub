@@ -802,19 +802,28 @@ function AppContent() {
 						<nav className="hidden md:flex items-center gap-1">
 							<button
 								className={`nav-link ${activeTab === "overview" ? "active" : ""}`}
-								onClick={() => setActiveTab("overview")}
+								onClick={() => {
+									setActiveTab("overview");
+									window.scrollTo({ top: 0, behavior: "smooth" });
+								}}
 							>
 								Overview
 							</button>
 							<button
 								className={`nav-link ${activeTab === "markets" ? "active" : ""}`}
-								onClick={() => setActiveTab("markets")}
+								onClick={() => {
+									setActiveTab("markets");
+									window.scrollTo({ top: 0, behavior: "smooth" });
+								}}
 							>
 								Markets
 							</button>
 							<button
 								className={`nav-link ${activeTab === "methodology" ? "active" : ""}`}
-								onClick={() => setActiveTab("methodology")}
+								onClick={() => {
+									setActiveTab("methodology");
+									window.scrollTo({ top: 0, behavior: "smooth" });
+								}}
 							>
 								Methodology
 							</button>
@@ -848,6 +857,7 @@ function AppContent() {
 								onClick={() => {
 									setActiveTab("overview");
 									setMobileMenuOpen(false);
+									window.scrollTo({ top: 0, behavior: "smooth" });
 								}}
 							>
 								Overview
@@ -857,6 +867,7 @@ function AppContent() {
 								onClick={() => {
 									setActiveTab("markets");
 									setMobileMenuOpen(false);
+									window.scrollTo({ top: 0, behavior: "smooth" });
 								}}
 							>
 								Markets
@@ -866,6 +877,7 @@ function AppContent() {
 								onClick={() => {
 									setActiveTab("methodology");
 									setMobileMenuOpen(false);
+									window.scrollTo({ top: 0, behavior: "smooth" });
 								}}
 							>
 								Methodology
