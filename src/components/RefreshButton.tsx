@@ -14,7 +14,7 @@ export function RefreshButton({
 			title="Refresh"
 		>
 			<svg
-				className={`w-4 h-4 ${isLoading ? "animate-spin-reverse" : ""}`}
+				className={`w-4 h-4 scale-x-[-1] ${isLoading ? "animate-spin-reverse" : ""}`}
 				fill="none"
 				viewBox="0 0 24 24"
 				stroke="currentColor"
