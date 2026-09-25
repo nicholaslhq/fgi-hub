@@ -3,7 +3,8 @@ const DATA_MODE_LABELS: Record<string, string> = {
 	mock: "Uses mock data for initial development. Data is simulated and not from live APIs.",
 };
 
-const DATA_SOURCE_ERROR_LABEL = "Unable to load live production data — API endpoints unavailable";
+const DATA_SOURCE_ERROR_LABEL =
+	"Unable to load live production data — API endpoints unavailable";
 const DATA_SOURCE_LOADING_LABEL = "Loading live production data...";
 
 export function Footer({
@@ -33,24 +34,22 @@ export function Footer({
 		window.scrollTo({ top: 0, behavior: "smooth" });
 	};
 
-	const handleNavigate = (tab: Parameters<NonNullable<typeof onNavigate>>[0]) => {
+	const handleNavigate = (
+		tab: Parameters<NonNullable<typeof onNavigate>>[0],
+	) => {
 		scrollToTop();
 		onNavigate?.(tab);
 	};
 
 	let label: string;
 	if (status === "error") {
-		label = isProdMode
-			? DATA_SOURCE_ERROR_LABEL
-			: DATA_MODE_LABELS.mock;
+		label = isProdMode ? DATA_SOURCE_ERROR_LABEL : DATA_MODE_LABELS.mock;
 	} else if (status === "loading" || apiAvailable === null) {
 		label = DATA_SOURCE_LOADING_LABEL;
 	} else if (isProdMode) {
 		label = DATA_MODE_LABELS.prod;
 	} else {
-		label = apiAvailable
-			? DATA_MODE_LABELS.prod
-			: DATA_MODE_LABELS.mock;
+		label = apiAvailable ? DATA_MODE_LABELS.prod : DATA_MODE_LABELS.mock;
 	}
 
 	return (
@@ -84,7 +83,9 @@ export function Footer({
 								<button
 									type="button"
 									className="footer-link"
-									onClick={() => handleNavigate("methodology")}
+									onClick={() =>
+										handleNavigate("methodology")
+									}
 								>
 									Methodology
 								</button>
@@ -119,7 +120,9 @@ export function Footer({
 								<button
 									type="button"
 									className="footer-link"
-									onClick={() => handleNavigate("datasources")}
+									onClick={() =>
+										handleNavigate("datasources")
+									}
 								>
 									Data Sources
 								</button>
@@ -127,14 +130,17 @@ export function Footer({
 						</ul>
 					</nav>
 
-					<nav aria-label="Connect" className="sm:col-span-2 lg:col-span-1">
+					<nav
+						aria-label="Connect"
+						className="sm:col-span-2 lg:col-span-1"
+					>
 						<h4 className="text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary)] mb-4">
 							Connect
 						</h4>
 						<ul className="space-y-1">
 							<li>
 								<a
-									href="https://github.com"
+									href="https://github.com/nicholaslhq/fgi-hub"
 									target="_blank"
 									rel="noopener noreferrer"
 									className="footer-link"
@@ -178,7 +184,8 @@ export function Footer({
 						</div>
 
 						<span className="text-xs text-[var(--color-text-tertiary)]">
-							© {new Date().getUTCFullYear()} FGI Hub. All rights reserved.
+							© {new Date().getUTCFullYear()} FGI Hub. All rights
+							reserved.
 						</span>
 					</div>
 
