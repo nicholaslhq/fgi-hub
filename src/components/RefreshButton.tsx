@@ -14,7 +14,7 @@ export function RefreshButton({
 			title="Refresh"
 		>
 			<svg
-				className={`w-4 h-4 scale-x-[-1] ${isLoading ? "animate-spin-reverse" : ""}`}
+				className={`w-4 h-4 ${isLoading ? "animate-spin" : ""}`}
 				fill="none"
 				viewBox="0 0 24 24"
 				stroke="currentColor"
@@ -23,7 +23,7 @@ export function RefreshButton({
 				<path
 					strokeLinecap="round"
 					strokeLinejoin="round"
-					d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+					d="M20 4v5h-.582m-15.356 2A8.001 8.001 0 0119.418 9m0 0H15m-11 11v-5h.581m0 0a8.003 8.003 0 0015.357-2m-15.357 2H9"
 				/>
 			</svg>
 		</button>
