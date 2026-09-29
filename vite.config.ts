@@ -49,8 +49,17 @@ function serverMiddleware(dataMode: string): Plugin {
 								);
 							}
 						} else if (path === "/health") {
+							const mod = await import(
+								"./src/services/index.server.js"
+							);
 							res.setHeader("Content-Type", "application/json");
-							res.end(JSON.stringify({ status: "ok" }));
+							res.end(
+								JSON.stringify({
+									status: "ok",
+									timestamp: new Date().toISOString(),
+									cache: mod.cache.getStats(),
+								}),
+							);
 						} else {
 							next();
 						}
@@ -74,7 +83,7 @@ export default defineConfig({
 		coverage: {
 			provider: "v8",
 			reporter: ["text", "lcov"],
-			include: ["src/services/aggregation.ts"],
+			include: ["src/services/aggregation.ts", "src/services/cache.ts"],
 		},
 	},
 });

@@ -14,5 +14,5 @@
     "allowSyntheticDefaultImports": true,
     "resolveJsonModule": true
   },
-  "include": ["src/server/index.ts", "src/services/index.server.ts", "src/services/aggregation.ts", "src/services/providers/serverStock.providers.ts", "src/services/providers/serverCrypto.providers.ts", "src/types/index.ts", "src/utils/errors.ts"]
+  "include": ["src/server/index.ts", "src/services/index.server.ts", "src/services/cache.ts", "src/services/aggregation.ts", "src/services/providers/serverStock.providers.ts", "src/services/providers/serverCrypto.providers.ts", "src/types/index.ts", "src/utils/errors.ts"]
 }

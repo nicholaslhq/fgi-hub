@@ -20,6 +20,7 @@ The dashboard is designed for market monitoring and education. Its outputs are i
 - Responsive light and dark themes with system-theme support
 - Overview, Markets, Methodology, About, Terms, Disclaimer, and Data Sources views
 - Express API and static-server source (requires fixes before production deployment)
+- In-memory consensus caching with request deduplication (see [Caching](#caching))
 
 ## Technology Stack
 
@@ -368,7 +369,7 @@ The server source defines these endpoints, and the `prod` Vite middleware expose
 
 | Method | Endpoint                | Response                           |
 | ------ | ----------------------- | ---------------------------------- |
-| `GET`  | `/api/health`           | Server health status and timestamp |
+| `GET`  | `/api/health`           | Server health status, timestamp, and cache statistics                          |
 | `GET`  | `/api/consensus/stock`  | Aggregated stock consensus         |
 | `GET`  | `/api/consensus/crypto` | Aggregated crypto consensus        |
 
@@ -408,6 +409,43 @@ A consensus response has this shape:
 
 `providerCount` is the number of valid providers used in aggregation. The `providers` array can be larger because failed records are retained for transparency. If no valid provider remains for a market, the server returns HTTP `502` and the client displays its error state with a retry action.
 
+## Caching
+
+FGI Hub caches consensus results on the server to minimize outbound requests to external providers. Each market (stock, crypto) is cached with an in-memory `ConsensusCache` in `src/services/cache.ts`.
+
+### Behavior
+
+| Condition | Action |
+|-----------|--------|
+| Cache fresh (within `FGI_CACHE_TTL`) | Returns cached data immediately — no upstream requests |
+| Cache expired, no in-flight fetch | Starts a new fetch from all 5 providers |
+| Cache expired, fetch in progress | Shares the in-flight request (deduplication) |
+| Fetch fails, stale cache exists | Returns stale cached data; cache entry is not overwritten |
+| Fetch fails, no cache exists | Propagates error (HTTP 502) |
+| Refresh button clicked rapidly | Reuses in-flight request; no additional upstream calls |
+
+The cache is **not** automatically refreshed in the background. A new fetch starts only when a request arrives after the TTL has expired and no in-flight fetch is already running.
+
+### Request Reduction
+
+Without caching, each `/api/consensus/:market` call triggers 5 external HTTP requests per market (10 total for both markets). With a 60-second TTL:
+
+- **Rapid refresh clicks** within the TTL return cached data instantly — zero upstream requests.
+- **Concurrent users** sharing the same server process have their requests deduplicated to a single upstream fetch.
+- **100 simultaneous requests** after cache expiry trigger exactly 1 upstream fetch, not 100.
+
+### Client-Side Fallback
+
+The browser hook (`src/hooks/useFearGreed.ts`) maintains a secondary 5-minute in-memory cache of the last successful API response. This cache is used **only** when the server is unreachable (network error or 502 with no stale server-side data). It is not consulted when the server responds normally — the server cache is always the primary layer.
+
+A client-side `fetchInFlightRef` guard prevents duplicate concurrent API requests within a single page session.
+
+### Configuration
+
+Set `FGI_CACHE_TTL` (seconds) in the shell environment before starting the server. Recommended range: 30–300 seconds (default: 60).
+
+Cache statistics are available via `GET /api/health`, which includes `hits`, `misses`, `staleReturns`, and `errors` counters.
+
 ## Configuration
 
 FGI Hub reads runtime configuration from the process environment. Set these variables in the shell before starting Vite or Node; the project does not currently load `.env` values through a dotenv package.
@@ -416,7 +454,7 @@ FGI Hub reads runtime configuration from the process environment. Set these vari
 | --------------- | ------: | -------------- | ------------------------------------------------------------------------------ |
 | `FGI_DATA_MODE` |  `mock` | Vite client    | Selects mock fallback or live API data and is compiled into the browser bundle |
 | `PORT`          |  `3001` | Express server | TCP port for the production server                                             |
-| `FGI_CACHE_TTL` |    `60` | Reserved       | Documented cache TTL in `.env.example`; no caching layer currently consumes it |
+| `FGI_CACHE_TTL` |    `60` | Express / Vite server | TTL in seconds for cached consensus responses; range 30–300s recommended             |
 
 `.env.example` is a configuration reference. For the current implementation, shell environment variables are the reliable way to configure Vite and the standalone server.
 
@@ -437,7 +475,7 @@ FGI Hub reads runtime configuration from the process environment. Set these vari
 
 ## Testing and Quality Checks
 
-The automated tests cover aggregation utilities, strategy selection, confidence calculation, temporal smoothing, invalid providers, small samples, outliers, stale data, confidence intervals, deterministic output, and stress scenarios. Utility tests also cover provider status counts and timestamp handling.
+The automated tests cover aggregation utilities, strategy selection, confidence calculation, temporal smoothing, invalid providers, small samples, outliers, stale data, confidence intervals, deterministic output, stress scenarios, and cache behavior (hits, misses, expiration, concurrent deduplication, upstream-failure fallback). Utility tests also cover provider status counts and timestamp handling.
 
 Run the standard checks before submitting a change:
 
@@ -460,8 +498,9 @@ Vitest is configured for a Node environment and discovers `src/**/*.test.ts`. Co
 │   ├── services/
 │   │   ├── providers/         Mock and live provider adapters
 │   │   ├── aggregation.ts     ARA implementation
+│   │   ├── cache.ts           Consensus caching (TTL, dedup, stale fallback)
 │   │   ├── index.ts           Mock orchestration
-│   │   └── index.server.ts    Live orchestration
+│   │   └── index.server.ts    Live orchestration with server-side cache
 │   ├── server/                Express API and static server
 │   ├── types/                 Shared TypeScript contracts
 │   ├── utils/                 Formatting, time, status, and error helpers
@@ -481,5 +520,6 @@ Vitest is configured for a Node environment and discovers `src/**/*.test.ts`. Co
 - Mock mode intentionally includes random scores and failure scenarios; repeated refreshes are expected to produce different values.
 - A confidence score describes the internal quality of the available sample. It does not guarantee future market behavior.
 - A confidence interval describes model uncertainty under the current sample assumptions; it is not a prediction range for future prices.
-- The dashboard does not currently implement response caching, authentication, or API-key management.
+- The dashboard implements in-memory server-side caching with a 60-second TTL (configurable via `FGI_CACHE_TTL`) and a secondary client-side fallback cache. See [Caching](#caching).
+- The dashboard does not currently implement authentication, or API-key management.
 - Review the in-application Disclaimer and the terms and policies of every third-party data source before production use.

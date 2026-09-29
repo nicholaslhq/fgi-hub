@@ -2,7 +2,7 @@ import express from "express";
 import cors from "cors";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { fetchStockConsensusProd, fetchCryptoConsensusProd } from "../services/index.server.js";
+import { fetchStockConsensusProd, fetchCryptoConsensusProd, cache } from "../services/index.server.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -31,7 +31,7 @@ app.get("/api/consensus/crypto", async (_req, res) => {
 });
 
 app.get("/api/health", (_req, res) => {
-	res.json({ status: "ok", timestamp: new Date().toISOString() });
+	res.json({ status: "ok", timestamp: new Date().toISOString(), cache: cache.getStats() });
 });
 
 const distPath = path.join(__dirname, "..");
