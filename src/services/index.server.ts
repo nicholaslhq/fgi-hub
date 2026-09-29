@@ -22,39 +22,11 @@ const cache = new ConsensusCache(CACHE_TTL_SECONDS);
 const CACHE_KEY_STOCK = "consensus:stock";
 const CACHE_KEY_CRYPTO = "consensus:crypto";
 
-function logCacheEvent(
-	market: "stock" | "crypto",
-	event: "hit" | "miss" | "stale" | "error",
-): void {
-	const stats = cache.getStats();
-	console.error(
-		`[cache] ${market} ${event} — hits=${stats.hits} misses=${stats.misses} stale=${stats.staleReturns} errors=${stats.errors}`,
-	);
-}
-
 async function fetchWithCache(
 	key: string,
-	market: "stock" | "crypto",
 	fetcher: () => Promise<ConsensusResult>,
 ): Promise<ConsensusResult> {
-	const before = cache.getStats();
-	try {
-		const result = await cache.getOrFetch(key, fetcher);
-		const after = cache.getStats();
-		if (after.hits > before.hits) {
-			logCacheEvent(market, "hit");
-		} else if (after.staleReturns > before.staleReturns) {
-			logCacheEvent(market, "stale");
-		} else if (after.errors > before.errors) {
-			logCacheEvent(market, "error");
-		} else {
-			logCacheEvent(market, "miss");
-		}
-		return result;
-	} catch (err) {
-		logCacheEvent(market, "error");
-		throw err;
-	}
+	return cache.getOrFetch(key, fetcher);
 }
 
 async function fetchConsensusProd(
@@ -91,7 +63,7 @@ export async function fetchStockConsensusProd(
 			previousScore,
 		);
 	}
-	return fetchWithCache(CACHE_KEY_STOCK, "stock", () =>
+	return fetchWithCache(CACHE_KEY_STOCK, () =>
 		fetchConsensusProd(
 			"stock",
 			serverStockProviders,
@@ -111,7 +83,7 @@ export async function fetchCryptoConsensusProd(
 			previousScore,
 		);
 	}
-	return fetchWithCache(CACHE_KEY_CRYPTO, "crypto", () =>
+	return fetchWithCache(CACHE_KEY_CRYPTO, () =>
 		fetchConsensusProd(
 			"crypto",
 			serverCryptoProviders,
