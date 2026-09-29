@@ -1,5 +1,6 @@
 import { useFearGreed } from "./hooks/useFearGreed";
 import { useTheme } from "./hooks/useTheme";
+import { useTimeTicker } from "./hooks/useTimeTicker";
 import { ThemeToggle } from "./components/ThemeToggle";
 import { Footer } from "./components/Footer";
 import {
@@ -18,6 +19,7 @@ import { DisclaimerView } from "./components/DisclaimerView";
 import { DataSourcesView } from "./components/DataSourcesView";
 import type { ConsensusResult } from "./types";
 import { sentimentLabel } from "./utils/sentiment";
+import { getTimestampTier } from "./utils/time";
 import React, { useState } from "react";
 
 function MarketHero({
@@ -382,6 +384,10 @@ function AppContent() {
 		apiAvailable,
 	} = useFearGreed();
 	const { theme, toggleTheme } = useTheme();
+	const now = useTimeTicker();
+	const isStale = lastRefreshed
+		? getTimestampTier(lastRefreshed, now) === "stale"
+		: false;
 	const [activeTab, setActiveTab] = useState<
 		| "overview"
 		| "markets"
@@ -849,6 +855,7 @@ function AppContent() {
 									refresh();
 								}}
 								isLoading={status === "loading"}
+								isStale={isStale}
 							/>
 						</div>
 					</div>

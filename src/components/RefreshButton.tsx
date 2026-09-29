@@ -1,18 +1,38 @@
+import { useEffect, useState } from "react";
+
 export function RefreshButton({
 	onClick,
 	isLoading,
+	isStale,
 }: {
 	onClick: () => void;
 	isLoading: boolean;
+	isStale?: boolean;
 }) {
+	const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
+
+	useEffect(() => {
+		const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+		setPrefersReducedMotion(mediaQuery.matches);
+		const handler = (e: MediaQueryListEvent) => setPrefersReducedMotion(e.matches);
+		mediaQuery.addEventListener("change", handler);
+		return () => mediaQuery.removeEventListener("change", handler);
+	}, []);
+
 	return (
 		<button
 			onClick={onClick}
 			disabled={isLoading}
-			className="icon-btn"
-			aria-label="Refresh sentiment data"
-			title="Refresh"
+			className="icon-btn relative"
+			aria-label={isStale ? "Refresh sentiment data (data is stale)" : "Refresh sentiment data"}
+			title={isStale ? "Data is stale — click to refresh" : "Refresh"}
+			style={{
+				animationPlayState: isStale && !isLoading && !prefersReducedMotion ? "running" : "paused",
+			}}
 		>
+			{isStale && (
+				<span className="stale-pulse-ring" aria-hidden="true" />
+			)}
 			<svg
 				className={`w-4 h-4 ${isLoading ? "animate-spin" : ""}`}
 				fill="none"
