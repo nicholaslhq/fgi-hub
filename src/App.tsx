@@ -804,7 +804,10 @@ function AppContent() {
 								className={`nav-link ${activeTab === "overview" ? "active" : ""}`}
 								onClick={() => {
 									setActiveTab("overview");
-									window.scrollTo({ top: 0, behavior: "smooth" });
+									window.scrollTo({
+										top: 0,
+										behavior: "smooth",
+									});
 								}}
 							>
 								Overview
@@ -813,7 +816,10 @@ function AppContent() {
 								className={`nav-link ${activeTab === "markets" ? "active" : ""}`}
 								onClick={() => {
 									setActiveTab("markets");
-									window.scrollTo({ top: 0, behavior: "smooth" });
+									window.scrollTo({
+										top: 0,
+										behavior: "smooth",
+									});
 								}}
 							>
 								Markets
@@ -822,7 +828,10 @@ function AppContent() {
 								className={`nav-link ${activeTab === "methodology" ? "active" : ""}`}
 								onClick={() => {
 									setActiveTab("methodology");
-									window.scrollTo({ top: 0, behavior: "smooth" });
+									window.scrollTo({
+										top: 0,
+										behavior: "smooth",
+									});
 								}}
 							>
 								Methodology
@@ -832,7 +841,13 @@ function AppContent() {
 						<div className="flex items-center gap-2 sm:gap-3">
 							<ThemeToggle theme={theme} onToggle={toggleTheme} />
 							<RefreshButton
-								onClick={refresh}
+								onClick={() => {
+									window.scrollTo({
+										top: 0,
+										behavior: "smooth",
+									});
+									refresh();
+								}}
 								isLoading={status === "loading"}
 							/>
 						</div>
@@ -857,7 +872,10 @@ function AppContent() {
 								onClick={() => {
 									setActiveTab("overview");
 									setMobileMenuOpen(false);
-									window.scrollTo({ top: 0, behavior: "smooth" });
+									window.scrollTo({
+										top: 0,
+										behavior: "smooth",
+									});
 								}}
 							>
 								Overview
@@ -867,7 +885,10 @@ function AppContent() {
 								onClick={() => {
 									setActiveTab("markets");
 									setMobileMenuOpen(false);
-									window.scrollTo({ top: 0, behavior: "smooth" });
+									window.scrollTo({
+										top: 0,
+										behavior: "smooth",
+									});
 								}}
 							>
 								Markets
@@ -877,7 +898,10 @@ function AppContent() {
 								onClick={() => {
 									setActiveTab("methodology");
 									setMobileMenuOpen(false);
-									window.scrollTo({ top: 0, behavior: "smooth" });
+									window.scrollTo({
+										top: 0,
+										behavior: "smooth",
+									});
 								}}
 							>
 								Methodology
