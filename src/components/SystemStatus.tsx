@@ -1,6 +1,7 @@
 import type { ConsensusResult } from "../types";
 import { countProviders } from "../utils/providerCounts";
 import { getTimestampTier } from "../utils/time";
+import { useTimeTicker } from "../hooks/useTimeTicker";
 import { Timestamp } from "./Timestamp";
 
 export function SystemStatus({
@@ -25,7 +26,8 @@ export function SystemStatus({
 		(stockCounts?.failed ?? 0) + (cryptoCounts?.failed ?? 0);
 
 	const isRefreshing = !lastRefreshed;
-	const tier = lastRefreshed ? getTimestampTier(lastRefreshed) : "fresh";
+	const now = useTimeTicker();
+	const tier = lastRefreshed ? getTimestampTier(lastRefreshed, now) : "fresh";
 	const isStaleData = tier === "stale";
 	const isOutdatedData = tier === "outdated";
 
