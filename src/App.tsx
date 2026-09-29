@@ -1,6 +1,7 @@
 import { useFearGreed } from "./hooks/useFearGreed";
 import { useTheme } from "./hooks/useTheme";
 import { useTimeTicker } from "./hooks/useTimeTicker";
+import { useRotatingLoadingMessage } from "./hooks/useLoadingMessage";
 import { ThemeToggle } from "./components/ThemeToggle";
 import { Footer } from "./components/Footer";
 import {
@@ -385,6 +386,7 @@ function AppContent() {
 	} = useFearGreed();
 	const { theme, toggleTheme } = useTheme();
 	const now = useTimeTicker();
+	const loadingMessage = useRotatingLoadingMessage();
 	const isStale = lastRefreshed
 		? getTimestampTier(lastRefreshed, now) === "stale"
 		: false;
@@ -444,7 +446,7 @@ function AppContent() {
 							className="text-base font-medium"
 							style={{ color: "var(--color-text-secondary)" }}
 						>
-							Aggregating sentiment data...
+							{loadingMessage}
 						</p>
 					</div>
 				</div>
